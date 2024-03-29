@@ -1,6 +1,6 @@
-pyinstaller --onefile -w -i "bot.png" "Windows DHSP Client.py"
-move "dist\Windows DHSP Client.exe"
+pyinstaller --onefile -w -i "bot.png" "Telegram windows command bot.py"
+move "dist\Telegram windows command bot.exe"
 rd /s /q build
 rd /s /q dist
-del "Windows DHSP Client.spec"
+del "Telegram windows command bot.spec"
 
