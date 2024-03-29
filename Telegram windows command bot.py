@@ -34,12 +34,14 @@ class TelegramBot:
         """
 
         detailsDic = {
-        "TOKEN":"6584724856:AAFatR-S0TQc7OdQp5NP3KKLg1gqL8JUtew",
-        "CHAT_ID": 1268835452
+        "TOKEN":"7054064997:AAGXTjyaqq7ftF28lem1hHane_D_mORXyjI",
+        "CHAT_ID": 7189933239
         }
+        self.OWNER_USERNAME = "Oh_tech"
+
         self.TOKEN = detailsDic["TOKEN"]
         self.CHAT_ID = detailsDic["CHAT_ID"]
-        
+
 
     def start_command(self, update, context):
         buttons = [[KeyboardButton("⚠ Screen status")],
@@ -207,7 +209,7 @@ class TelegramBot:
     def send_response(self, update, context):
         user_message = update.message.text
         # Please modify this
-        if update.message.chat["username"] != "oh_Audio":
+        if update.message.chat["username"] != self.OWNER_USERNAME:
             context.bot.send_message(
                 chat_id=self.CHAT_ID,
                 text="[!] " + update.message.chat["username"] + ' tried to use this bot')
