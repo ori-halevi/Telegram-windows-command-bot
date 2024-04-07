@@ -1,0 +1,1 @@
+SCHTASKS /CREATE /SC ONLOGON /TN "ORI_TelegramWinBot" /TR '"C:\User program files\Telegram windows command bot.exe"' /RL HIGHEST
