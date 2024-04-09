@@ -15,6 +15,8 @@ import pyautogui
 import time
 import cv2
 import numpy as np
+import time
+
 
 
 
@@ -44,15 +46,17 @@ class TelegramBot:
 
 
     def start_command(self, update, context):
-        buttons = [[KeyboardButton("⚠ Screen status")],
-                   [KeyboardButton("🔒 Lock screen")],
-                   [KeyboardButton("📸 Take screenshot")],
-                   [KeyboardButton("🎥 Screen recording")],
-                   [KeyboardButton("✂ Paste clipboard")],
-                   [KeyboardButton("📄 List process")],
-                   [KeyboardButton("🖥 Go dark")],
-                   [KeyboardButton("💤 Sleep")],
-                   [KeyboardButton("💡 More commands")]]
+        buttons = [
+                    [KeyboardButton("📡 Turn Hot-spot on and off")],
+                    [KeyboardButton("🖥 Go dark")],
+                    [KeyboardButton("💤 Sleep")],
+                    [KeyboardButton("⚠ Screen status")],
+                    [KeyboardButton("🔒 Lock screen")],
+                    [KeyboardButton("📸 Take screenshot")],
+                    [KeyboardButton("🎥 Screen recording")],
+                    [KeyboardButton("✂ Paste clipboard")],
+                    [KeyboardButton("📄 List process")],
+                    [KeyboardButton("💡 More commands")]]
         context.bot.send_message(
             chat_id=update.message.chat.id, text="I will do what you command.", reply_markup=ReplyKeyboardMarkup(buttons))
 
@@ -105,6 +109,18 @@ class TelegramBot:
                 if (proc.name() == "LogonUI.exe"):
                     return 'Screen is Locked'
             return 'Screen is Unlocked'
+
+        if input_text == 'turn Hot-spot on and off':
+            pyautogui.hotkey('win', 'a')  # דומה ללחיצה על WIN+A
+            time.sleep(1)
+            pyautogui.press('down')
+            time.sleep(1)
+            pyautogui.press('right')
+            time.sleep(1)
+            pyautogui.press('enter')
+            time.sleep(1)
+            pyautogui.press('esc')
+            return 'Hot-spot command has been activated!'
 
         if input_text == 'lock screen':
             try:
