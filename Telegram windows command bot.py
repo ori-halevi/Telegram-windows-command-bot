@@ -12,7 +12,6 @@ import webbrowser
 import pyperclip
 import subprocess
 import pyautogui
-import time
 import cv2
 import numpy as np
 import time
@@ -111,6 +110,8 @@ class TelegramBot:
             return 'Screen is Unlocked'
 
         if input_text == 'turn Hot-spot on and off':
+            pyautogui.hotkey('win')  # דומה ללחיצה על WIN
+            time.sleep(1)
             pyautogui.hotkey('win', 'a')  # דומה ללחיצה על WIN+A
             time.sleep(1)
             pyautogui.press('down')
@@ -181,14 +182,14 @@ class TelegramBot:
                         psutil.Process(int(p[1])).terminate()
                 return 'Process terminated successfully'
             except:
-                return 'Error occured while killing the process'
+                return 'Error occurred while killing the process'
 
         if usr_msg[0] == 'url':
             try:
                 webbrowser.open(usr_msg[1])
                 return 'Link opened successfully'
             except:
-                return 'Error occured while opening link'
+                return 'Error occurred while opening link'
 
         if usr_msg[0] == "cd":
             if usr_msg[1]:

@@ -3,4 +3,3 @@ move "dist\Telegram windows command bot.exe"
 rd /s /q build
 rd /s /q dist
 del "Telegram windows command bot.spec"
-
