@@ -1,0 +1,13 @@
+להפעיל רק את פקודות הקוד מתוך הסביבה הוירטואלית דלהלן, ניתן לעשות באמצעות הפאייצ'ארם
+"C:\Users\OH\Desktop\My scripts\Python\Virtual work environments\Telegram-windows-command bot-VerE\Scripts\activate.bat"
+
+cd "C:\Users\OH\Desktop\My scripts\Python\Private\Telegram-windows-command-bot"
+
+
+# This is the code:
+
+pyinstaller --onefile -w -i "bot.png" --paths "C:\Users\OH\Desktop\My scripts\Python\Virtual work environments\Telegram-windows-command bot-VerE\Lib\site-packages" "Telegram windows command bot.py"
+move "dist\Telegram windows command bot.exe"
+rd /s /q build
+rd /s /q dist
+del "Telegram windows command bot.spec"
