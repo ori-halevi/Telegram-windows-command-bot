@@ -3,6 +3,8 @@ This bot works on Python 3.11
 """
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from telegram import KeyboardButton, ReplyKeyboardMarkup
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import CallbackContext, CallbackQueryHandler
 from mss import mss
 import tempfile
 import os
@@ -43,10 +45,10 @@ class TelegramBot:
         self.TOKEN = detailsDic["TOKEN"]
         self.CHAT_ID = detailsDic["CHAT_ID"]
 
-
     def start_command(self, update, context):
         buttons = [
                     [KeyboardButton("📡 Turn Hot-spot on and off")],
+                    [KeyboardButton("🎧 Turn Bluetooth on and off")],
                     [KeyboardButton("🖥 Go dark")],
                     [KeyboardButton("💤 Sleep")],
                     [KeyboardButton("⚠ Screen status")],
@@ -55,50 +57,28 @@ class TelegramBot:
                     [KeyboardButton("🎥 Screen recording")],
                     [KeyboardButton("✂ Paste clipboard")],
                     [KeyboardButton("📄 List process")],
-                    [KeyboardButton("💡 More commands")]]
+                    [KeyboardButton("💡 More commands")],
+                    [KeyboardButton("🎦 VLC commands")]
+
+        ]
         context.bot.send_message(
             chat_id=update.message.chat.id, text="I will do what you command.", reply_markup=ReplyKeyboardMarkup(buttons))
 
-    def error(self, update, context):
-        print(f"Update {update} caused error {context.error}")
-
-    def start_recording(self):
-        TEMPDIR = tempfile.gettempdir()
-        os.chdir(TEMPDIR)
-
-        video_file_path = self.record_screen()  # הקלטת המסך למשך דקה
-
-        # שליחת הסרטון לצ'אט
-        return video_file_path
-
-    def record_screen(self):
-        # יצירת סרטון במסך
-        duration = 30  # זמן בשניות
-        video_file_path = os.path.join(tempfile.gettempdir(), 'screen_record.mkv')
-
-        fourcc = cv2.VideoWriter_fourcc(*"mp4v")
-        screen_size = pyautogui.size()
-        out = cv2.VideoWriter(video_file_path, fourcc, 20.0, (screen_size.width, screen_size.height))
-
-        start_time = time.time()
-
-        while (time.time() - start_time) < duration:
-            screenshot = pyautogui.screenshot()
-            frame = np.array(screenshot)
-            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            out.write(frame)
-
-        out.release()
-        return video_file_path
-
-    def take_screenshot(self):
-        TEMPDIR = tempfile.gettempdir()
-        os.chdir(TEMPDIR)
-        with mss() as sct:
-            sct.shot(mon=-1)
-        return os.path.join(TEMPDIR, 'monitor-0.png')
     def handle_message(self, update, input_text):
         usr_msg = input_text.split()
+
+        if input_text == "vLC commands":
+
+            buttons = [
+                [InlineKeyboardButton("⏯", callback_data='play')],
+                [InlineKeyboardButton("⏮", callback_data='prev'), InlineKeyboardButton("⏹", callback_data='stop'), InlineKeyboardButton("⏭", callback_data='next')],
+                [InlineKeyboardButton("⏪ x10s", callback_data='short_jump_backward'), InlineKeyboardButton("⏩ x10s", callback_data='short_jump_forward')],
+                [InlineKeyboardButton("⏪ x1m", callback_data='medium_short_jump_backward'), InlineKeyboardButton("⏩ x1m", callback_data='medium_short_jump_forward')],
+                [InlineKeyboardButton("➖", callback_data='vol_down'), InlineKeyboardButton("➕", callback_data='vol_up')],
+                [InlineKeyboardButton("🌍", callback_data='change_lang')]
+            ]
+            keyboard_markup = InlineKeyboardMarkup(buttons)
+            update.message.reply_text("Choose a VLC command:", reply_markup=keyboard_markup)
 
         if input_text == "more commands":
             return """url <link>: open a link on the browser\nkill <proc>: terminate process\ncmd <command>: execute shell command\ncd <dir>: change directory\ndownload <file>: download a file"""
@@ -110,7 +90,7 @@ class TelegramBot:
             return 'Screen is Unlocked'
 
         if input_text == 'turn Hot-spot on and off':
-            pyautogui.hotkey('win')  # דומה ללחיצה על WIN
+            pyautogui.hotkey('win', 's')
             time.sleep(1)
             pyautogui.hotkey('win', 'a')  # דומה ללחיצה על WIN+A
             time.sleep(1)
@@ -122,6 +102,18 @@ class TelegramBot:
             time.sleep(1)
             pyautogui.press('esc')
             return 'Hot-spot command has been activated!'
+
+        if input_text == 'turn Bluetooth on and off':
+            pyautogui.hotkey('win', 's')
+            time.sleep(1)
+            pyautogui.hotkey('win', 'a')  # דומה ללחיצה על WIN+A
+            time.sleep(1)
+            pyautogui.press('right')
+            time.sleep(1)
+            pyautogui.press('enter')
+            time.sleep(1)
+            pyautogui.press('esc')
+            return 'Bluetooth command has been activated!'
 
         if input_text == 'lock screen':
             try:
@@ -223,6 +215,73 @@ class TelegramBot:
             else:
                 return ''
 
+    def handle_callback(self, update, context):
+        query = update.callback_query
+        query.answer()
+
+        # Execute the command based on the callback_data
+        command = query.data
+        if command == 'play':
+            pyautogui.press('space')
+        elif command == 'prev':
+            pass
+        elif command == 'stop':
+            pyautogui.press('s')
+        elif command == 'next':
+            pyautogui.press('n')
+        elif command == 'short_jump_forward':
+            pyautogui.hotkey('alt', 'right')
+        elif command == 'short_jump_backward':
+            pyautogui.hotkey('alt', 'left')
+        elif command == 'medium_short_jump_forward':
+            pyautogui.hotkey('ctrl', 'right')
+        elif command == 'medium_short_jump_backward':
+            pyautogui.hotkey('ctrl', 'left')
+        elif command == 'vol_up':
+            pyautogui.press('up')
+        elif command == 'vol_down':
+            pyautogui.press('down')
+        elif command == 'change_lang':
+            pyautogui.hotkey('win', 'space')
+
+    def error(self, update, context):
+        print(f"Update {update} caused error {context.error}")
+
+    def start_recording(self):
+        TEMPDIR = tempfile.gettempdir()
+        os.chdir(TEMPDIR)
+
+        video_file_path = self.record_screen()  # הקלטת המסך למשך דקה
+
+        # שליחת הסרטון לצ'אט
+        return video_file_path
+
+    def record_screen(self):
+        # יצירת סרטון במסך
+        duration = 30  # זמן בשניות
+        video_file_path = os.path.join(tempfile.gettempdir(), 'screen_record.mkv')
+
+        fourcc = cv2.VideoWriter_fourcc(*"mp4v")
+        screen_size = pyautogui.size()
+        out = cv2.VideoWriter(video_file_path, fourcc, 20.0, (screen_size.width, screen_size.height))
+
+        start_time = time.time()
+
+        while (time.time() - start_time) < duration:
+            screenshot = pyautogui.screenshot()
+            frame = np.array(screenshot)
+            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            out.write(frame)
+
+        out.release()
+        return video_file_path
+    def take_screenshot(self):
+        TEMPDIR = tempfile.gettempdir()
+        os.chdir(TEMPDIR)
+        with mss() as sct:
+            sct.shot(mon=-1)
+        return os.path.join(TEMPDIR, 'monitor-0.png')
+
     def send_response(self, update, context):
         user_message = update.message.text
         # Please modify this
@@ -253,6 +312,7 @@ class TelegramBot:
         dp.add_handler(CommandHandler("start", self.start_command))
         dp.add_handler(MessageHandler(Filters.text, self.send_response))
         dp.add_error_handler(self.error)
+        dp.add_handler(CallbackQueryHandler(self.handle_callback))
         updater.start_polling()
         print("[+] BOT has started")
         updater.idle()

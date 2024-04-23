@@ -11,3 +11,20 @@ move "dist\Telegram windows command bot.exe"
 rd /s /q build
 rd /s /q dist
 del "Telegram windows command bot.spec"
+
+
+
+סיכום פקודות לטרמינל של פאייצארם שהוא עובד על פאוארשל:
+cd "C:\Users\OH\Desktop\My scripts\Python\Private\Telegram-windows-command-bot"
+
+pyinstaller --onefile -w -i "bot.png" --paths "C:\Users\OH\Desktop\My scripts\Python\Virtual work environments\Telegram-windows-command bot-VerE\Lib\site-packages" "Telegram windows command bot.py"
+
+move "dist\Telegram windows command bot.exe"
+
+Remove-Item -Path "build" -Recurse -Force
+
+Remove-Item -Path "dist" -Recurse -Force
+
+del "Telegram windows command bot.spec"
+
+
