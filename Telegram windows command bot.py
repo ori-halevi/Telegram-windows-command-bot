@@ -123,8 +123,8 @@ class TelegramBot:
                 return "Error while locking screen"
 
         if input_text == "take screenshot":
-            update.message.bot.send_photo(
-                chat_id=self.CHAT_ID, photo=open(self.take_screenshot(), 'rb'))
+            update.message.bot.send_document(
+                chat_id=self.CHAT_ID, document=open(self.take_screenshot(), 'rb'))
             return None
 
 
