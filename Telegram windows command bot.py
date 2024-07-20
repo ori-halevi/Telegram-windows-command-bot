@@ -4,6 +4,7 @@ from telegram import KeyboardButton, ReplyKeyboardMarkup
 from bot_commands import Commands
 import os
 
+
 class TelegramBot:
     def __init__(self):
         detailsDic = {
@@ -12,8 +13,8 @@ class TelegramBot:
         }
         self.OWNER_USERNAME = "Oh_tech"
         self.TOKEN = detailsDic["TOKEN"]
-        self.CHAT_ID = detailsDic["CHAT_ID"]
-        self.bot_commands = Commands(self.CHAT_ID)
+        self.OWNER_CHAT_ID = detailsDic["CHAT_ID"]
+        self.bot_commands = Commands(self.OWNER_CHAT_ID)
 
     def start_command(self, update, context):
         buttons = [
@@ -39,23 +40,48 @@ class TelegramBot:
         )
 
     def handle_message(self, update, context):
-        usr_msg = update.message.text.strip().lower()
-        response = self.bot_commands.execute_command(usr_msg, update)
-        if response:
-            if len(response) > 4096:
-                for i in range(0, len(response), 4096):
-                    context.bot.send_message(chat_id=self.CHAT_ID, text=response[i:4096+i])
-            else:
-                context.bot.send_message(chat_id=self.CHAT_ID, text=response)
+        security_check = self.security_check(update, context)
+        if security_check:
+            usr_msg = update.message.text.strip().lower()
+            response = self.bot_commands.execute_command(usr_msg, update)
+            if response:
+                if len(response) > 4096:
+                    for i in range(0, len(response), 4096):
+                        context.bot.send_message(chat_id=self.OWNER_CHAT_ID, text=response[i:4096 + i])
+                else:
+                    context.bot.send_message(chat_id=self.OWNER_CHAT_ID, text=response)
+
+    def security_check(self, update, context):
+        user_info = update.message.chat
+        user_username = user_info["username"]
+        user_first_name = user_info["first_name"]
+        user_last_name = user_info["last_name"]
+        user_id = user_info["id"]
+        if str(user_info["username"]) != self.OWNER_USERNAME:
+            context.bot.send_message(
+                chat_id=self.OWNER_CHAT_ID,
+                text='[!] Someone tried to use this bot.\n' +
+                     'their username is: @' + str(user_username) + '\n' +
+                     'their first name is: ' + str(user_first_name) + '\n' +
+                     'their last name is: ' + str(user_last_name) + '\n' +
+                     'their id is: ' + str(user_id) + '\n'
+                     'their attempt was: ' + update.message.text.strip().lower())
+            context.bot.send_message(
+                chat_id=user_id,
+                text="Only the owner can send commands to the computer,\nI have reported your activity to the " +
+                     "owner!\nThe owner will text to you soon, don't worry, He is a very nice person.")
+            return False
+        else:
+            return True
 
     def handle_callback(self, update, context):
         query = update.callback_query
         query.answer()
         data = query.data
-        print(data)
         # טיפול בפקודות VLC
         if data in ['play', 'prev', 'stop', 'next', 'short_jump_forward', 'short_jump_backward',
-                    'medium_short_jump_forward', 'medium_short_jump_backward', 'vol_up', 'vol_down', 'next_audio_track',
+                    'medium_short_jump_forward', 'medium_short_jump_backward', 'vol_up', 'vol_down',
+                    'next_audio_track',
                     'next_sub', 'delay_sub', 'rush_sub', 'change_lang']:
             self.bot_commands.handle_vlc_command(data)
         elif data in ['play', 'next_ep', 'tab', 'jump_forward', 'jump_backward']:
@@ -81,6 +107,7 @@ class TelegramBot:
         updater.start_polling()
         print("[+] BOT has started")
         updater.idle()
+
 
 if __name__ == "__main__":
     bot = TelegramBot()
