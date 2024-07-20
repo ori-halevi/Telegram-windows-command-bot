@@ -29,6 +29,7 @@ class TelegramBot:
             [KeyboardButton("📄 List process")],
             [KeyboardButton("💡 More commands")],
             [KeyboardButton("🎦 VLC commands")],
+            [KeyboardButton("🎬 netflix commands")],
             [KeyboardButton("⌨️ Keyboard")]
         ]
         context.bot.send_message(
@@ -51,12 +52,17 @@ class TelegramBot:
         query = update.callback_query
         query.answer()
         data = query.data
-
+        print(data)
         # טיפול בפקודות VLC
         if data in ['play', 'prev', 'stop', 'next', 'short_jump_forward', 'short_jump_backward',
                     'medium_short_jump_forward', 'medium_short_jump_backward', 'vol_up', 'vol_down', 'next_audio_track',
-                    'next_sub', 'change_lang']:
+                    'next_sub', 'delay_sub', 'rush_sub', 'change_lang']:
             self.bot_commands.handle_vlc_command(data)
+        elif data in ['play', 'next_ep', 'tab', 'jump_forward', 'jump_backward']:
+            self.bot_commands.handle_netflix_command(data)
+
+        elif data.split()[0] == "alt_tab":
+            self.bot_commands.tab_shortcuts(int(data.split()[1]))
 
         # טיפול בלחיצות מקלדת
         else:
