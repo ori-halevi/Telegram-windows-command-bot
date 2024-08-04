@@ -13,6 +13,236 @@ import tempfile
 from mss import mss
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
+
+def handle_vlc_command(command):
+    if command == 'play':
+        pyautogui.press('space')
+    elif command == 'prev':
+        pyautogui.press('p')
+    elif command == 'stop':
+        pyautogui.press('s')
+    elif command == 'next':
+        pyautogui.press('n')
+    elif command == 'next_chapter':
+        pyautogui.hotkey('shift', 'n')
+    elif command == 'short_jump_forward':
+        pyautogui.hotkey('alt', 'right')
+    elif command == 'short_jump_backward':
+        pyautogui.hotkey('alt', 'left')
+    elif command == 'medium_short_jump_forward':
+        pyautogui.hotkey('ctrl', 'right')
+    elif command == 'medium_short_jump_backward':
+        pyautogui.hotkey('ctrl', 'left')
+    elif command == 'vol_up':
+        pyautogui.press('up')
+    elif command == 'vol_down':
+        pyautogui.press('down')
+    elif command == 'next_audio_track':
+        pyautogui.press('b')
+    elif command == 'next_sub':
+        pyautogui.press('v')
+    elif command == 'delay_sub':
+        pyautogui.press('g')
+    elif command == 'rush_sub':
+        pyautogui.press('h')
+    elif command == 'change_lang':
+        pyautogui.hotkey('win', 'space')
+
+
+def handle_netflix_command(command):
+    if command == 'esc':
+        pyautogui.press('esc')
+    if command == 'play':
+        pyautogui.press('space')
+    elif command == 'next_ep':
+        for _ in range(6): pyautogui.hotkey('shift', 'tab')
+        pyautogui.press('enter')
+        # time.sleep(1)
+    elif command == 'tab':
+        pyautogui.press('tab')
+    elif command == 'shift_tab':
+        pyautogui.hotkey('shift', 'tab')
+    elif command == 'enter':
+        pyautogui.press('enter')
+    elif command == 'skip_intro':
+        for _ in range(3): pyautogui.press('tab')
+        pyautogui.press('enter')
+    elif command == 'jump_backward':
+        pyautogui.press('ctrl')
+        pyautogui.press('left')
+    elif command == 'jump_forward':
+        pyautogui.press('ctrl')
+        pyautogui.press('right')
+    elif command == 'jump_backward_x_2':
+        pyautogui.press('ctrl')
+        pyautogui.press('left')
+        pyautogui.press('left')
+    elif command == 'jump_forward_x_2':
+        pyautogui.press('ctrl')
+        pyautogui.press('right')
+        pyautogui.press('right')
+    elif command == 'vol_up':
+        pyautogui.press('up')
+    elif command == 'vol_down':
+        pyautogui.press('down')
+    elif command == 'change_lang':
+        pyautogui.hotkey('win', 'space')
+
+
+def keyboard_command(key):
+    if key.split()[0] == "alt_tab":
+        pyautogui.keyDown('alt')
+        pyautogui.press('tab', presses=int(key.split()[1]),
+                        interval=0.5)  # Press 'tab' twice with an interval of 0.5 seconds between the presses
+        pyautogui.keyUp('alt')
+        return
+    elif key == "change_lang":
+        pyautogui.hotkey('win', 'space')
+        return
+    elif key == "caps_lock":
+        pyautogui.hotkey('capslock')
+        return
+    pyautogui.press(str(key))
+
+
+def toggle_hotspot():
+    pyautogui.hotkey('win', 's')
+    time.sleep(1)
+    pyautogui.hotkey('win', 'a')
+    time.sleep(1)
+    pyautogui.press('down')
+    time.sleep(1)
+    pyautogui.press('right')
+    time.sleep(1)
+    pyautogui.press('enter')
+    time.sleep(1)
+    pyautogui.press('esc')
+
+
+def toggle_bluetooth():
+    pyautogui.hotkey('win', 's')
+    time.sleep(1)
+    pyautogui.hotkey('win', 'a')
+    time.sleep(1)
+    pyautogui.press('right')
+    time.sleep(1)
+    pyautogui.press('enter')
+    time.sleep(1)
+    pyautogui.press('esc')
+
+
+def clean_screen():
+    pyautogui.hotkey('win', 's')
+    time.sleep(2)
+    pyautogui.press('esc')
+
+
+def lock_screen():
+    try:
+        ctypes.windll.user32.LockWorkStation()
+        return "Screen locked successfully"
+    except:
+        return "Error while locking screen"
+
+
+def record_screen():
+    duration = 30
+    video_file_path = os.path.join(tempfile.gettempdir(), 'screen_record.mkv')
+    fourcc = cv2.VideoWriter_fourcc(*"mp4v")
+    screen_size = pyautogui.size()
+    out = cv2.VideoWriter(video_file_path, fourcc, 20.0, (screen_size.width, screen_size.height))
+    start_time = time.time()
+    while (time.time() - start_time) < duration:
+        screenshot = pyautogui.screenshot()
+        frame = np.array(screenshot)
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        out.write(frame)
+    out.release()
+    return video_file_path
+
+
+def start_recording():
+    temp_dir = tempfile.gettempdir()
+    os.chdir(temp_dir)
+    video_file_path = record_screen()
+    return video_file_path
+
+
+def take_screenshot():
+    temp_dir = tempfile.gettempdir()
+    os.chdir(temp_dir)
+    with mss() as sct:
+        sct.shot(mon=-1)
+    return os.path.join(temp_dir, 'monitor-0.png')
+
+
+def put_to_sleep():
+    try:
+        subprocess.run(['start', 'shutdown', '/h'], shell=True)
+        return "Windows was put to sleep"
+    except:
+        return "Cannot put Windows to sleep"
+
+
+def go_dark():
+    try:
+        subprocess.run(['start', '%SystemRoot%\\System32\\scrnsave.scr', '/s'], shell=True)
+        return "Windows went dark"
+    except:
+        return "Failed to dim windows"
+
+
+def list_process():
+    try:
+        proc_list = []
+        for proc in psutil.process_iter():
+            if proc.name() not in proc_list:
+                proc_list.append(proc.name())
+        processes = "\n".join(proc_list)
+        return processes
+    except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+        return "Error listing processes"
+
+
+def kill_process(proc_name):
+    try:
+        for proc in psutil.process_iter():
+            if proc.name() == proc_name:
+                proc.terminate()
+                return 'Process terminated successfully'
+        return 'Process not found'
+    except:
+        return 'Error occurred while killing the process'
+
+
+def open_url(url):
+    try:
+        webbrowser.open(url)
+        return 'Link opened successfully'
+    except:
+        return 'Error occurred while opening link'
+
+
+def change_directory(dir_path):
+    try:
+        os.chdir(dir_path)
+        return os.getcwd()
+    except:
+        return "Directory not found !"
+
+
+def execute_shell_command(command):
+    res = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.DEVNULL)
+    stdout = res.stdout.read().decode("utf-8", 'ignore').strip()
+    stderr = res.stderr.read().decode("utf-8", 'ignore').strip()
+    if stdout:
+        return stdout
+    elif stderr:
+        return stderr
+    else:
+        return ''
+
+
 class Commands:
     def __init__(self, chat_id):
         self.CHAT_ID = chat_id
@@ -152,253 +382,57 @@ class Commands:
             return 'Screen is Unlocked'
 
         if input_text == '📡 turn hot-spot on and off':
-            self.toggle_hotspot()
+            toggle_hotspot()
             return 'Hot-spot command has been activated! /CleanScreen'
 
         if input_text == '🎧 turn bluetooth on and off':
-            self.toggle_bluetooth()
+            toggle_bluetooth()
             return 'Bluetooth command has been activated! /CleanScreen'
 
         if input_text == '/cleanscreen':
-            self.clean_screen()
+            clean_screen()
 
         if input_text == '🔒 lock screen':
-            return self.lock_screen()
+            return lock_screen()
 
         if input_text == "📸 take screenshot":
             update.message.bot.send_document(
-                chat_id=self.CHAT_ID, document=open(self.take_screenshot(), 'rb'))
+                chat_id=self.CHAT_ID, document=open(take_screenshot(), 'rb'))
             return
 
         if input_text == "🎥 screen recording":
             update.message.bot.send_message(
                 chat_id=self.CHAT_ID, text="Wait 30 seconds")
             update.message.bot.send_video(
-                chat_id=self.CHAT_ID, video=open(self.start_recording(), 'rb'))
+                chat_id=self.CHAT_ID, video=open(start_recording(), 'rb'))
             return
 
         if input_text == "✂ paste clipboard":
             return pyperclip.paste()
 
         if input_text == "💤 sleep":
-            return self.put_to_sleep()
+            return put_to_sleep()
 
         if input_text == "🖥 go dark":
-            return self.go_dark()
+            return go_dark()
 
         if input_text == "📄 list process":
-            return self.list_process()
+            return list_process()
 
         if usr_msg[0] == 'kill':
-            return self.kill_process(usr_msg[1])
+            return kill_process(usr_msg[1])
 
         if usr_msg[0] == 'url':
-            return self.open_url(usr_msg[1])
+            return open_url(usr_msg[1])
 
         if usr_msg[0] == "cd":
-            return self.change_directory(usr_msg[1])
+            return change_directory(usr_msg[1])
 
         if usr_msg[0] == "download":
             return self.download_file(usr_msg[1], update)
 
         if usr_msg[0] == "cmd":
-            return self.execute_shell_command(usr_msg[1:])
-
-    def handle_vlc_command(self, command):
-        if command == 'play':
-            pyautogui.press('space')
-        elif command == 'prev':
-            pyautogui.press('p')
-        elif command == 'stop':
-            pyautogui.press('s')
-        elif command == 'next':
-            pyautogui.press('n')
-        elif command == 'next_chapter':
-            pyautogui.hotkey('shift', 'n')
-        elif command == 'short_jump_forward':
-            pyautogui.hotkey('alt', 'right')
-        elif command == 'short_jump_backward':
-            pyautogui.hotkey('alt', 'left')
-        elif command == 'medium_short_jump_forward':
-            pyautogui.hotkey('ctrl', 'right')
-        elif command == 'medium_short_jump_backward':
-            pyautogui.hotkey('ctrl', 'left')
-        elif command == 'vol_up':
-            pyautogui.press('up')
-        elif command == 'vol_down':
-            pyautogui.press('down')
-        elif command == 'next_audio_track':
-            pyautogui.press('b')
-        elif command == 'next_sub':
-            pyautogui.press('v')
-        elif command == 'delay_sub':
-            pyautogui.press('g')
-        elif command == 'rush_sub':
-            pyautogui.press('h')
-        elif command == 'change_lang':
-            pyautogui.hotkey('win', 'space')
-
-    def handle_netflix_command(self, command):
-        if command == 'esc':
-            pyautogui.press('esc')
-        if command == 'play':
-            pyautogui.press('space')
-        elif command == 'next_ep':
-            for _ in range(6): pyautogui.hotkey('shift', 'tab')
-            pyautogui.press('enter')
-            # time.sleep(1)
-        elif command == 'tab':
-            pyautogui.press('tab')
-        elif command == 'shift_tab':
-            pyautogui.hotkey('shift', 'tab')
-        elif command == 'enter':
-            pyautogui.press('enter')
-        elif command == 'skip_intro':
-            for _ in range(3): pyautogui.press('tab')
-            pyautogui.press('enter')
-        elif command == 'jump_backward':
-            pyautogui.press('ctrl')
-            pyautogui.press('left')
-        elif command == 'jump_forward':
-            pyautogui.press('ctrl')
-            pyautogui.press('right')
-        elif command == 'jump_backward_x_2':
-            pyautogui.press('ctrl')
-            pyautogui.press('left')
-            pyautogui.press('left')
-        elif command == 'jump_forward_x_2':
-            pyautogui.press('ctrl')
-            pyautogui.press('right')
-            pyautogui.press('right')
-        elif command == 'vol_up':
-            pyautogui.press('up')
-        elif command == 'vol_down':
-            pyautogui.press('down')
-        elif command == 'change_lang':
-            pyautogui.hotkey('win', 'space')
-
-
-    def keyboard_command(self, key):
-        if key.split()[0] == "alt_tab":
-            pyautogui.keyDown('alt')
-            pyautogui.press('tab', presses=int(key.split()[1]),
-                            interval=0.5)  # Press 'tab' twice with an interval of 0.5 seconds between the presses
-            pyautogui.keyUp('alt')
-            return
-        pyautogui.press(str(key))
-
-    def toggle_hotspot(self):
-        pyautogui.hotkey('win', 's')
-        time.sleep(1)
-        pyautogui.hotkey('win', 'a')
-        time.sleep(1)
-        pyautogui.press('down')
-        time.sleep(1)
-        pyautogui.press('right')
-        time.sleep(1)
-        pyautogui.press('enter')
-        time.sleep(1)
-        pyautogui.press('esc')
-
-    def toggle_bluetooth(self):
-        pyautogui.hotkey('win', 's')
-        time.sleep(1)
-        pyautogui.hotkey('win', 'a')
-        time.sleep(1)
-        pyautogui.press('right')
-        time.sleep(1)
-        pyautogui.press('enter')
-        time.sleep(1)
-        pyautogui.press('esc')
-
-    def clean_screen(self):
-        pyautogui.hotkey('win', 's')
-        time.sleep(2)
-        pyautogui.press('esc')
-
-    def lock_screen(self):
-        try:
-            ctypes.windll.user32.LockWorkStation()
-            return "Screen locked successfully"
-        except:
-            return "Error while locking screen"
-
-    def start_recording(self):
-        TEMPDIR = tempfile.gettempdir()
-        os.chdir(TEMPDIR)
-        video_file_path = self.record_screen()
-        return video_file_path
-
-    def record_screen(self):
-        duration = 30
-        video_file_path = os.path.join(tempfile.gettempdir(), 'screen_record.mkv')
-        fourcc = cv2.VideoWriter_fourcc(*"mp4v")
-        screen_size = pyautogui.size()
-        out = cv2.VideoWriter(video_file_path, fourcc, 20.0, (screen_size.width, screen_size.height))
-        start_time = time.time()
-        while (time.time() - start_time) < duration:
-            screenshot = pyautogui.screenshot()
-            frame = np.array(screenshot)
-            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            out.write(frame)
-        out.release()
-        return video_file_path
-
-    def take_screenshot(self):
-        temp_dir = tempfile.gettempdir()
-        os.chdir(temp_dir)
-        with mss() as sct:
-            sct.shot(mon=-1)
-        return os.path.join(temp_dir, 'monitor-0.png')
-
-    def put_to_sleep(self):
-        try:
-            subprocess.run(['start', 'shutdown', '/h'], shell=True)
-            return "Windows was put to sleep"
-        except:
-            return "Cannot put Windows to sleep"
-
-    def go_dark(self):
-        try:
-            subprocess.run(['start', '%SystemRoot%\\System32\\scrnsave.scr', '/s'], shell=True)
-            return "Windows went dark"
-        except:
-            return "Failed to dim windows"
-
-    def list_process(self):
-        try:
-            proc_list = []
-            for proc in psutil.process_iter():
-                if proc.name() not in proc_list:
-                    proc_list.append(proc.name())
-            processes = "\n".join(proc_list)
-            return processes
-        except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
-            return "Error listing processes"
-
-    def kill_process(self, proc_name):
-        try:
-            for proc in psutil.process_iter():
-                if proc.name() == proc_name:
-                    proc.terminate()
-                    return 'Process terminated successfully'
-            return 'Process not found'
-        except:
-            return 'Error occurred while killing the process'
-
-    def open_url(self, url):
-        try:
-            webbrowser.open(url)
-            return 'Link opened successfully'
-        except:
-            return 'Error occurred while opening link'
-
-    def change_directory(self, dir_path):
-        try:
-            os.chdir(dir_path)
-            return os.getcwd()
-        except:
-            return "Directory not found !"
+            return execute_shell_command(usr_msg[1:])
 
     def download_file(self, file_path, update):
         if os.path.exists(file_path):
@@ -409,14 +443,3 @@ class Commands:
                 return "Something went wrong !"
         else:
             return "File not found"
-
-    def execute_shell_command(self, command):
-        res = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.DEVNULL)
-        stdout = res.stdout.read().decode("utf-8", 'ignore').strip()
-        stderr = res.stderr.read().decode("utf-8", 'ignore').strip()
-        if stdout:
-            return stdout
-        elif stderr:
-            return stderr
-        else:
-            return ''
