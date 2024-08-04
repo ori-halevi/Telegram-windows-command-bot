@@ -2,7 +2,6 @@
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler
 from telegram import KeyboardButton, ReplyKeyboardMarkup
 from bot_commands import Commands
-import os
 
 
 class TelegramBot:
@@ -30,12 +29,14 @@ class TelegramBot:
             [KeyboardButton("📄 List process")],
             [KeyboardButton("💡 More commands")],
             [KeyboardButton("🎦 VLC commands")],
-            [KeyboardButton("🎬 netflix commands")],
+            [KeyboardButton("🎬 NETFLIX commands")],
             [KeyboardButton("⌨️ Keyboard")]
         ]
         context.bot.send_message(
             chat_id=update.message.chat.id,
-            text="I will do what you command.",
+            text="""
+            Welcome to Ori's bot, this bot controls my computer!\nThis bot is private! But you can download the source code from Github and adapt it to your computer!
+            """,
             reply_markup=ReplyKeyboardMarkup(buttons)
         )
 
@@ -43,7 +44,7 @@ class TelegramBot:
         security_check = self.security_check(update, context)
         if security_check:
             usr_msg = update.message.text.strip().lower()
-            response = self.bot_commands.execute_command(usr_msg, update)
+            response = self.bot_commands.execute_command (usr_msg, update)
             if response:
                 if len(response) > 4096:
                     for i in range(0, len(response), 4096):
@@ -78,24 +79,16 @@ class TelegramBot:
         query = update.callback_query
         query.answer()
         data = query.data
-        # טיפול בפקודות VLC
-        if data in ['play', 'prev', 'stop', 'next', 'short_jump_forward', 'short_jump_backward',
-                    'medium_short_jump_forward', 'medium_short_jump_backward', 'vol_up', 'vol_down',
-                    'next_audio_track',
-                    'next_sub', 'delay_sub', 'rush_sub', 'change_lang']:
+        keys_msg = query.message.text.lower()
+        if 'VLC' in keys_msg:
             self.bot_commands.handle_vlc_command(data)
-        elif data in ['play', 'next_ep', 'tab', 'jump_forward', 'jump_backward']:
+        elif 'netflix' in keys_msg:
             self.bot_commands.handle_netflix_command(data)
-
-        elif data.split()[0] == "alt_tab":
-            self.bot_commands.tab_shortcuts(int(data.split()[1]))
-
-        # טיפול בלחיצות מקלדת
-        else:
+        elif 'keyboard' in keys_msg:
             self.bot_commands.keyboard_command(data)
 
     def error(self, update, context):
-        print(f"Update {update} caused error {context.error}")
+        print("Update {} caused error {}".format(update, context.error))
 
     def start_bot(self):
         updater = Updater(self.TOKEN, use_context=True)

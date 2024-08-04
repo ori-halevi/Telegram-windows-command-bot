@@ -23,10 +23,11 @@ class Commands:
             buttons = [
                 [InlineKeyboardButton("⏯", callback_data='play')],
                 [InlineKeyboardButton("⏮", callback_data='prev'), InlineKeyboardButton("⏹", callback_data='stop'), InlineKeyboardButton("⏭", callback_data='next')],
+                [InlineKeyboardButton("next chapter ⤵", callback_data='next_chapter')],
                 [InlineKeyboardButton("⏪ x10s", callback_data='short_jump_backward'), InlineKeyboardButton("⏩ x10s", callback_data='short_jump_forward')],
                 [InlineKeyboardButton("⏪ x1m", callback_data='medium_short_jump_backward'), InlineKeyboardButton("⏩ x1m", callback_data='medium_short_jump_forward')],
                 [InlineKeyboardButton("➖", callback_data='vol_down'), InlineKeyboardButton("➕", callback_data='vol_up')],
-                [InlineKeyboardButton("🔊", callback_data='next_audio_track'), InlineKeyboardButton("✍️", callback_data='next_sub')],
+                [InlineKeyboardButton("🗣", callback_data='next_audio_track'), InlineKeyboardButton("✍️", callback_data='next_sub')],
                 [InlineKeyboardButton("✍️➖", callback_data='delay_sub'), InlineKeyboardButton("✍️➕", callback_data='rush_sub')],
                 [InlineKeyboardButton("🌍", callback_data='change_lang')]
             ]
@@ -41,8 +42,12 @@ class Commands:
                 [InlineKeyboardButton("⏭", callback_data='next_ep')],
                 [InlineKeyboardButton("↹", callback_data='tab'), InlineKeyboardButton("⇧ + ↹", callback_data='shift_tab')],
                 [InlineKeyboardButton("⏎", callback_data='enter')],
-                [InlineKeyboardButton("⏪ x12s", callback_data='jump_backward'),
-                 InlineKeyboardButton("⏩ x8s", callback_data='jump_forward')],
+                [InlineKeyboardButton("Skip intro", callback_data='skip_intro')],
+                [InlineKeyboardButton("⏪", callback_data='jump_backward'),
+                 InlineKeyboardButton("⏩", callback_data='jump_forward')],
+                [InlineKeyboardButton("⏪ x2", callback_data='jump_backward_x_2'),
+                 InlineKeyboardButton("⏩ x2 ", callback_data='jump_forward_x_2')],
+                [InlineKeyboardButton("➖", callback_data='vol_down'), InlineKeyboardButton("➕", callback_data='vol_up')],
                 [InlineKeyboardButton("🌍", callback_data='change_lang')]
             ]
             keyboard_markup = InlineKeyboardMarkup(buttons)
@@ -51,64 +56,83 @@ class Commands:
 
         if input_text == "⌨️ keyboard":
             buttons = [
-                [InlineKeyboardButton("Esc", callback_data='esc'),
-                 InlineKeyboardButton("F1", callback_data='f1'), InlineKeyboardButton("F2", callback_data='f2'),
-                 InlineKeyboardButton("F3", callback_data='f3'), InlineKeyboardButton("F4", callback_data='f4'),
-                 InlineKeyboardButton("F5", callback_data='f5'), InlineKeyboardButton("F6", callback_data='f6'),
-                 InlineKeyboardButton("F7", callback_data='f7')],
+                    # Esc Backspace
+                [InlineKeyboardButton(" ", callback_data='noop'),InlineKeyboardButton("Esc", callback_data='esc'),
+                 InlineKeyboardButton("Backspace", callback_data='backspace'), InlineKeyboardButton(" ", callback_data='noop')],
 
-                [InlineKeyboardButton("F8", callback_data='f8'),
+                    # F1 F2 F3 F4 F5 F6
+                 [InlineKeyboardButton("F1", callback_data='f1'), InlineKeyboardButton("F2", callback_data='f2'),
+                 InlineKeyboardButton("F3", callback_data='f3'), InlineKeyboardButton("F4", callback_data='f4'),
+                 InlineKeyboardButton("F5", callback_data='f5'), InlineKeyboardButton("F6", callback_data='f6')],
+
+                    # F7 F8 F9 F10 F11 F12
+                [InlineKeyboardButton("F7", callback_data='f7'), InlineKeyboardButton("F8", callback_data='f8'),
                  InlineKeyboardButton("F9", callback_data='f9'), InlineKeyboardButton("F10", callback_data='f10'),
                  InlineKeyboardButton("F11", callback_data='f11'), InlineKeyboardButton("F12", callback_data='f12')],
 
-                [InlineKeyboardButton("`", callback_data='`'), InlineKeyboardButton("1", callback_data='1'),
-                 InlineKeyboardButton("2", callback_data='2'), InlineKeyboardButton("3", callback_data='3'),
-                 InlineKeyboardButton("4", callback_data='4'), InlineKeyboardButton("5", callback_data='5'),
-                 InlineKeyboardButton("6", callback_data='6'), InlineKeyboardButton("7", callback_data='7')],
+                    # 1 2 3 4 5 6 7 8
+                [InlineKeyboardButton("1", callback_data='1'), InlineKeyboardButton("2", callback_data='2'),
+                 InlineKeyboardButton("3", callback_data='3'), InlineKeyboardButton("4", callback_data='4'),
+                 InlineKeyboardButton("5", callback_data='5'), InlineKeyboardButton("6", callback_data='6'),
+                 InlineKeyboardButton("7", callback_data='7'), InlineKeyboardButton("8", callback_data='8')],
 
-                [InlineKeyboardButton("8", callback_data='8'), InlineKeyboardButton("9", callback_data='9'),
-                 InlineKeyboardButton("0", callback_data='0'), InlineKeyboardButton("-", callback_data='-'),
-                 InlineKeyboardButton("=", callback_data='='),
-                 InlineKeyboardButton("Backspace", callback_data='backspace')],
+                    # 9 0 ( ) - = `
+                [InlineKeyboardButton("9", callback_data='9'), InlineKeyboardButton("0", callback_data='0'),
+                 InlineKeyboardButton("(", callback_data='('), InlineKeyboardButton(")", callback_data=')'),
+                 InlineKeyboardButton("-", callback_data='-'), InlineKeyboardButton("+", callback_data='+'),
+                 InlineKeyboardButton("=", callback_data='='), InlineKeyboardButton("`", callback_data='`')],
 
-                [InlineKeyboardButton("Tab", callback_data='tab'), InlineKeyboardButton("Q", callback_data='q'),
-                 InlineKeyboardButton("W", callback_data='w'), InlineKeyboardButton("E", callback_data='e'),
-                 InlineKeyboardButton("R", callback_data='r'), InlineKeyboardButton("T", callback_data='t'),
-                 InlineKeyboardButton("Y", callback_data='y'), InlineKeyboardButton("U", callback_data='u')],
+                    # Q W E R T Y U
+                [InlineKeyboardButton("Q", callback_data='q'),InlineKeyboardButton("W", callback_data='w'),
+                 InlineKeyboardButton("E", callback_data='e'), InlineKeyboardButton("R", callback_data='r'),
+                 InlineKeyboardButton("T", callback_data='t'), InlineKeyboardButton("Y", callback_data='y'),
+                 InlineKeyboardButton("U", callback_data='u')],
 
+                    # I O P A S D F
                 [InlineKeyboardButton("I", callback_data='i'), InlineKeyboardButton("O", callback_data='o'),
-                 InlineKeyboardButton("P", callback_data='p'), InlineKeyboardButton("[", callback_data='['),
-                 InlineKeyboardButton("]", callback_data=']'),
-                 InlineKeyboardButton("\\", callback_data='\\')],
-
-                [InlineKeyboardButton("Caps", callback_data='caps_lock'), InlineKeyboardButton("A", callback_data='a'),
+                 InlineKeyboardButton("P", callback_data='p'),InlineKeyboardButton("A", callback_data='a'),
                  InlineKeyboardButton("S", callback_data='s'), InlineKeyboardButton("D", callback_data='d'),
-                 InlineKeyboardButton("F", callback_data='f'), InlineKeyboardButton("G", callback_data='g'),
-                 InlineKeyboardButton("H", callback_data='h'), InlineKeyboardButton("J", callback_data='j')],
+                 InlineKeyboardButton("F", callback_data='f')],
 
-                [InlineKeyboardButton("K", callback_data='k'), InlineKeyboardButton("L", callback_data='l'),
+                    # G H J K L Z X
+                [InlineKeyboardButton("G", callback_data='g'), InlineKeyboardButton("H", callback_data='h'),
+                 InlineKeyboardButton("J", callback_data='j'), InlineKeyboardButton("K", callback_data='k'),
+                 InlineKeyboardButton("L", callback_data='l'), InlineKeyboardButton("Z", callback_data='z'),
+                 InlineKeyboardButton("X", callback_data='x')],
+
+                    # C V B N M
+                [InlineKeyboardButton(" ", callback_data='noop'), InlineKeyboardButton("C", callback_data='c'),
+                 InlineKeyboardButton("V", callback_data='v'), InlineKeyboardButton("B", callback_data='b'),
+                 InlineKeyboardButton("N", callback_data='n'), InlineKeyboardButton("M", callback_data='m'),
+                 InlineKeyboardButton(" ", callback_data='noop')],
+
+                    # [ ] ; '
+                [InlineKeyboardButton("[", callback_data='['),
+                 InlineKeyboardButton("]", callback_data=']'),
                  InlineKeyboardButton(";", callback_data=';'),
-                 InlineKeyboardButton("'", callback_data="'"),
-                 InlineKeyboardButton("Enter", callback_data='enter')],
+                 InlineKeyboardButton("'", callback_data="'")],
 
-                [InlineKeyboardButton("Shift", callback_data='shift'), InlineKeyboardButton("Z", callback_data='z'),
-                 InlineKeyboardButton("X", callback_data='x'), InlineKeyboardButton("C", callback_data='c'),
-                 InlineKeyboardButton("V", callback_data='v'), InlineKeyboardButton("B", callback_data='b')],
+                    # / \ , .
+                [InlineKeyboardButton("/", callback_data='/'), InlineKeyboardButton("\\", callback_data='\\'),
+                 InlineKeyboardButton(",", callback_data=','), InlineKeyboardButton(".", callback_data='.')],
 
-                [InlineKeyboardButton("N", callback_data='n'), InlineKeyboardButton("M", callback_data='m'),
-                 InlineKeyboardButton(",", callback_data=','), InlineKeyboardButton(".", callback_data='.'),
-                 InlineKeyboardButton("/", callback_data='/'),
+                    # Tab Enter Space
+                [InlineKeyboardButton("Tab", callback_data='tab'), InlineKeyboardButton("Enter", callback_data='enter'),
+                 InlineKeyboardButton("Space", callback_data='space')],
+
+                    # Ctrl Alt Shift
+                [InlineKeyboardButton("Ctrl", callback_data='ctrl'), InlineKeyboardButton("Alt", callback_data='alt'),
                  InlineKeyboardButton("Shift", callback_data='shift')],
 
-                [InlineKeyboardButton("Ctrl", callback_data='ctrl'),
-                 InlineKeyboardButton("Space", callback_data='space'),
-                 InlineKeyboardButton("Alt", callback_data='alt')],
-
+                    # ↑
                 [InlineKeyboardButton("↑", callback_data='up')],
 
+                    # ← ↓ →
                 [InlineKeyboardButton("←", callback_data='left'), InlineKeyboardButton("↓", callback_data='down'),
                  InlineKeyboardButton("→", callback_data='right')],
-                [InlineKeyboardButton("🌍", callback_data='change_lang')],
+
+                    # Change lang Caps
+                [InlineKeyboardButton("🌍", callback_data='change_lang'), InlineKeyboardButton("Caps", callback_data='caps_lock')],
 
                 [InlineKeyboardButton("Alt + Tab, 1", callback_data='alt_tab 1'), InlineKeyboardButton("Alt + Tab, 2", callback_data='alt_tab 2')],
                 [InlineKeyboardButton("Alt + Tab, 3", callback_data='alt_tab 3'), InlineKeyboardButton("Alt + Tab, 4", callback_data='alt_tab 4')]
@@ -184,11 +208,13 @@ class Commands:
         if command == 'play':
             pyautogui.press('space')
         elif command == 'prev':
-            pass
+            pyautogui.press('p')
         elif command == 'stop':
             pyautogui.press('s')
         elif command == 'next':
             pyautogui.press('n')
+        elif command == 'next_chapter':
+            pyautogui.hotkey('shift', 'n')
         elif command == 'short_jump_forward':
             pyautogui.hotkey('alt', 'right')
         elif command == 'short_jump_backward':
@@ -213,32 +239,52 @@ class Commands:
             pyautogui.hotkey('win', 'space')
 
     def handle_netflix_command(self, command):
+        if command == 'esc':
+            pyautogui.press('esc')
         if command == 'play':
             pyautogui.press('space')
         elif command == 'next_ep':
-            pyautogui.press('tab')
-            time.sleep(1)
+            for _ in range(6): pyautogui.hotkey('shift', 'tab')
             pyautogui.press('enter')
+            # time.sleep(1)
         elif command == 'tab':
             pyautogui.press('tab')
         elif command == 'shift_tab':
             pyautogui.hotkey('shift', 'tab')
         elif command == 'enter':
             pyautogui.press('enter')
-        elif command == 'jump_forward':
-            pyautogui.press('ctrl')
-            pyautogui.press('right')
+        elif command == 'skip_intro':
+            for _ in range(3): pyautogui.press('tab')
+            pyautogui.press('enter')
         elif command == 'jump_backward':
             pyautogui.press('ctrl')
             pyautogui.press('left')
+        elif command == 'jump_forward':
+            pyautogui.press('ctrl')
+            pyautogui.press('right')
+        elif command == 'jump_backward_x_2':
+            pyautogui.press('ctrl')
+            pyautogui.press('left')
+            pyautogui.press('left')
+        elif command == 'jump_forward_x_2':
+            pyautogui.press('ctrl')
+            pyautogui.press('right')
+            pyautogui.press('right')
+        elif command == 'vol_up':
+            pyautogui.press('up')
+        elif command == 'vol_down':
+            pyautogui.press('down')
+        elif command == 'change_lang':
+            pyautogui.hotkey('win', 'space')
 
-    def tab_shortcuts(self, num):
-        pyautogui.keyDown('alt')
-        pyautogui.press('tab', presses=num, interval=0.5)  # לוחץ על 'tab' פעמיים עם מרווח של 0.5 שניות בין הלחיצות
-        pyautogui.keyUp('alt')
 
     def keyboard_command(self, key):
-        print(str(key).lower())
+        if key.split()[0] == "alt_tab":
+            pyautogui.keyDown('alt')
+            pyautogui.press('tab', presses=int(key.split()[1]),
+                            interval=0.5)  # Press 'tab' twice with an interval of 0.5 seconds between the presses
+            pyautogui.keyUp('alt')
+            return
         pyautogui.press(str(key))
 
     def toggle_hotspot(self):
@@ -299,11 +345,11 @@ class Commands:
         return video_file_path
 
     def take_screenshot(self):
-        TEMPDIR = tempfile.gettempdir()
-        os.chdir(TEMPDIR)
+        temp_dir = tempfile.gettempdir()
+        os.chdir(temp_dir)
         with mss() as sct:
             sct.shot(mon=-1)
-        return os.path.join(TEMPDIR, 'monitor-0.png')
+        return os.path.join(temp_dir, 'monitor-0.png')
 
     def put_to_sleep(self):
         try:
