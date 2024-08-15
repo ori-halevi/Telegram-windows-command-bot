@@ -232,7 +232,8 @@ def change_directory(dir_path):
 
 
 def execute_shell_command(command):
-    res = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.DEVNULL)
+    res = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                           stdin=subprocess.DEVNULL)
     stdout = res.stdout.read().decode("utf-8", 'ignore').strip()
     stderr = res.stderr.read().decode("utf-8", 'ignore').strip()
     if stdout:
@@ -252,13 +253,19 @@ class Commands:
         if input_text == "🎦 vlc commands":
             buttons = [
                 [InlineKeyboardButton("⏯", callback_data='play')],
-                [InlineKeyboardButton("⏮", callback_data='prev'), InlineKeyboardButton("⏹", callback_data='stop'), InlineKeyboardButton("⏭", callback_data='next')],
+                [InlineKeyboardButton("⏮", callback_data='prev'), InlineKeyboardButton("⏹", callback_data='stop'),
+                 InlineKeyboardButton("⏭", callback_data='next')],
                 [InlineKeyboardButton("next chapter ⤵", callback_data='next_chapter')],
-                [InlineKeyboardButton("⏪ x10s", callback_data='short_jump_backward'), InlineKeyboardButton("⏩ x10s", callback_data='short_jump_forward')],
-                [InlineKeyboardButton("⏪ x1m", callback_data='medium_short_jump_backward'), InlineKeyboardButton("⏩ x1m", callback_data='medium_short_jump_forward')],
-                [InlineKeyboardButton("➖", callback_data='vol_down'), InlineKeyboardButton("➕", callback_data='vol_up')],
-                [InlineKeyboardButton("🗣", callback_data='next_audio_track'), InlineKeyboardButton("✍️", callback_data='next_sub')],
-                [InlineKeyboardButton("✍️➖", callback_data='delay_sub'), InlineKeyboardButton("✍️➕", callback_data='rush_sub')],
+                [InlineKeyboardButton("⏪ x10s", callback_data='short_jump_backward'),
+                 InlineKeyboardButton("⏩ x10s", callback_data='short_jump_forward')],
+                [InlineKeyboardButton("⏪ x1m", callback_data='medium_short_jump_backward'),
+                 InlineKeyboardButton("⏩ x1m", callback_data='medium_short_jump_forward')],
+                [InlineKeyboardButton("➖", callback_data='vol_down'),
+                 InlineKeyboardButton("➕", callback_data='vol_up')],
+                [InlineKeyboardButton("🗣", callback_data='next_audio_track'),
+                 InlineKeyboardButton("✍️", callback_data='next_sub')],
+                [InlineKeyboardButton("✍️➖", callback_data='delay_sub'),
+                 InlineKeyboardButton("✍️➕", callback_data='rush_sub')],
                 [InlineKeyboardButton("🌍", callback_data='change_lang')]
             ]
             keyboard_markup = InlineKeyboardMarkup(buttons)
@@ -270,14 +277,16 @@ class Commands:
                 [InlineKeyboardButton("Esc", callback_data='esc')],
                 [InlineKeyboardButton("⏯", callback_data='play')],
                 [InlineKeyboardButton("⏭", callback_data='next_ep')],
-                [InlineKeyboardButton("↹", callback_data='tab'), InlineKeyboardButton("⇧ + ↹", callback_data='shift_tab')],
+                [InlineKeyboardButton("↹", callback_data='tab'),
+                 InlineKeyboardButton("⇧ + ↹", callback_data='shift_tab')],
                 [InlineKeyboardButton("⏎", callback_data='enter')],
                 [InlineKeyboardButton("Skip intro", callback_data='skip_intro')],
                 [InlineKeyboardButton("⏪", callback_data='jump_backward'),
                  InlineKeyboardButton("⏩", callback_data='jump_forward')],
                 [InlineKeyboardButton("⏪ x2", callback_data='jump_backward_x_2'),
                  InlineKeyboardButton("⏩ x2 ", callback_data='jump_forward_x_2')],
-                [InlineKeyboardButton("➖", callback_data='vol_down'), InlineKeyboardButton("➕", callback_data='vol_up')],
+                [InlineKeyboardButton("➖", callback_data='vol_down'),
+                 InlineKeyboardButton("➕", callback_data='vol_up')],
                 [InlineKeyboardButton("🌍", callback_data='change_lang')]
             ]
             keyboard_markup = InlineKeyboardMarkup(buttons)
@@ -286,86 +295,90 @@ class Commands:
 
         if input_text == "⌨️ keyboard":
             buttons = [
-                    # Esc Backspace
-                [InlineKeyboardButton(" ", callback_data='noop'),InlineKeyboardButton("Esc", callback_data='esc'),
-                 InlineKeyboardButton("Backspace", callback_data='backspace'), InlineKeyboardButton(" ", callback_data='noop')],
+                # Esc Backspace
+                [InlineKeyboardButton(" ", callback_data='noop'), InlineKeyboardButton("Esc", callback_data='esc'),
+                 InlineKeyboardButton("Backspace", callback_data='backspace'),
+                 InlineKeyboardButton(" ", callback_data='noop')],
 
-                    # F1 F2 F3 F4 F5 F6
-                 [InlineKeyboardButton("F1", callback_data='f1'), InlineKeyboardButton("F2", callback_data='f2'),
+                # F1 F2 F3 F4 F5 F6
+                [InlineKeyboardButton("F1", callback_data='f1'), InlineKeyboardButton("F2", callback_data='f2'),
                  InlineKeyboardButton("F3", callback_data='f3'), InlineKeyboardButton("F4", callback_data='f4'),
                  InlineKeyboardButton("F5", callback_data='f5'), InlineKeyboardButton("F6", callback_data='f6')],
 
-                    # F7 F8 F9 F10 F11 F12
+                # F7 F8 F9 F10 F11 F12
                 [InlineKeyboardButton("F7", callback_data='f7'), InlineKeyboardButton("F8", callback_data='f8'),
                  InlineKeyboardButton("F9", callback_data='f9'), InlineKeyboardButton("F10", callback_data='f10'),
                  InlineKeyboardButton("F11", callback_data='f11'), InlineKeyboardButton("F12", callback_data='f12')],
 
-                    # 1 2 3 4 5 6 7 8
+                # 1 2 3 4 5 6 7 8
                 [InlineKeyboardButton("1", callback_data='1'), InlineKeyboardButton("2", callback_data='2'),
                  InlineKeyboardButton("3", callback_data='3'), InlineKeyboardButton("4", callback_data='4'),
                  InlineKeyboardButton("5", callback_data='5'), InlineKeyboardButton("6", callback_data='6'),
                  InlineKeyboardButton("7", callback_data='7'), InlineKeyboardButton("8", callback_data='8')],
 
-                    # 9 0 ( ) - = `
+                # 9 0 ( ) - = `
                 [InlineKeyboardButton("9", callback_data='9'), InlineKeyboardButton("0", callback_data='0'),
                  InlineKeyboardButton("(", callback_data='('), InlineKeyboardButton(")", callback_data=')'),
                  InlineKeyboardButton("-", callback_data='-'), InlineKeyboardButton("+", callback_data='+'),
                  InlineKeyboardButton("=", callback_data='='), InlineKeyboardButton("`", callback_data='`')],
 
-                    # Q W E R T Y U
-                [InlineKeyboardButton("Q", callback_data='q'),InlineKeyboardButton("W", callback_data='w'),
+                # Q W E R T Y U
+                [InlineKeyboardButton("Q", callback_data='q'), InlineKeyboardButton("W", callback_data='w'),
                  InlineKeyboardButton("E", callback_data='e'), InlineKeyboardButton("R", callback_data='r'),
                  InlineKeyboardButton("T", callback_data='t'), InlineKeyboardButton("Y", callback_data='y'),
                  InlineKeyboardButton("U", callback_data='u')],
 
-                    # I O P A S D F
+                # I O P A S D F
                 [InlineKeyboardButton("I", callback_data='i'), InlineKeyboardButton("O", callback_data='o'),
-                 InlineKeyboardButton("P", callback_data='p'),InlineKeyboardButton("A", callback_data='a'),
+                 InlineKeyboardButton("P", callback_data='p'), InlineKeyboardButton("A", callback_data='a'),
                  InlineKeyboardButton("S", callback_data='s'), InlineKeyboardButton("D", callback_data='d'),
                  InlineKeyboardButton("F", callback_data='f')],
 
-                    # G H J K L Z X
+                # G H J K L Z X
                 [InlineKeyboardButton("G", callback_data='g'), InlineKeyboardButton("H", callback_data='h'),
                  InlineKeyboardButton("J", callback_data='j'), InlineKeyboardButton("K", callback_data='k'),
                  InlineKeyboardButton("L", callback_data='l'), InlineKeyboardButton("Z", callback_data='z'),
                  InlineKeyboardButton("X", callback_data='x')],
 
-                    # C V B N M
+                # C V B N M
                 [InlineKeyboardButton(" ", callback_data='noop'), InlineKeyboardButton("C", callback_data='c'),
                  InlineKeyboardButton("V", callback_data='v'), InlineKeyboardButton("B", callback_data='b'),
                  InlineKeyboardButton("N", callback_data='n'), InlineKeyboardButton("M", callback_data='m'),
                  InlineKeyboardButton(" ", callback_data='noop')],
 
-                    # [ ] ; '
+                # [ ] ; '
                 [InlineKeyboardButton("[", callback_data='['),
                  InlineKeyboardButton("]", callback_data=']'),
                  InlineKeyboardButton(";", callback_data=';'),
                  InlineKeyboardButton("'", callback_data="'")],
 
-                    # / \ , .
+                # / \ , .
                 [InlineKeyboardButton("/", callback_data='/'), InlineKeyboardButton("\\", callback_data='\\'),
                  InlineKeyboardButton(",", callback_data=','), InlineKeyboardButton(".", callback_data='.')],
 
-                    # Tab Enter Space
+                # Tab Enter Space
                 [InlineKeyboardButton("Tab", callback_data='tab'), InlineKeyboardButton("Enter", callback_data='enter'),
                  InlineKeyboardButton("Space", callback_data='space')],
 
-                    # Ctrl Alt Shift
+                # Ctrl Alt Shift
                 [InlineKeyboardButton("Ctrl", callback_data='ctrl'), InlineKeyboardButton("Alt", callback_data='alt'),
                  InlineKeyboardButton("Shift", callback_data='shift')],
 
-                    # ↑
+                # ↑
                 [InlineKeyboardButton("↑", callback_data='up')],
 
-                    # ← ↓ →
+                # ← ↓ →
                 [InlineKeyboardButton("←", callback_data='left'), InlineKeyboardButton("↓", callback_data='down'),
                  InlineKeyboardButton("→", callback_data='right')],
 
-                    # Change lang Caps
-                [InlineKeyboardButton("🌍", callback_data='change_lang'), InlineKeyboardButton("Caps", callback_data='caps_lock')],
+                # Change lang Caps
+                [InlineKeyboardButton("🌍", callback_data='change_lang'),
+                 InlineKeyboardButton("Caps", callback_data='caps_lock')],
 
-                [InlineKeyboardButton("Alt + Tab, 1", callback_data='alt_tab 1'), InlineKeyboardButton("Alt + Tab, 2", callback_data='alt_tab 2')],
-                [InlineKeyboardButton("Alt + Tab, 3", callback_data='alt_tab 3'), InlineKeyboardButton("Alt + Tab, 4", callback_data='alt_tab 4')]
+                [InlineKeyboardButton("Alt + Tab, 1", callback_data='alt_tab 1'),
+                 InlineKeyboardButton("Alt + Tab, 2", callback_data='alt_tab 2')],
+                [InlineKeyboardButton("Alt + Tab, 3", callback_data='alt_tab 3'),
+                 InlineKeyboardButton("Alt + Tab, 4", callback_data='alt_tab 4')]
             ]
 
             keyboard_markup = InlineKeyboardMarkup(buttons)

@@ -39,7 +39,7 @@ def handle_callback(update, context):
     query.answer()
     data = query.data
     keys_msg = query.message.text.lower()
-    if 'VLC' in keys_msg:
+    if 'vlc' in keys_msg:
         handle_vlc_command(data)
     elif 'netflix' in keys_msg:
         handle_netflix_command(data)
