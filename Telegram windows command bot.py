@@ -6,9 +6,9 @@ from dotenv import load_dotenv
 import os
 import json
 from datetime import datetime
-
 # טוען את המשתנים מהקובץ .env
 load_dotenv()
+
 
 # גישה למשתנים
 BOT_TOKEN = os.getenv('BOT_TOKEN')

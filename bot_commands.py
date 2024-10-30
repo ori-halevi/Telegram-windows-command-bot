@@ -12,19 +12,20 @@ import time
 import tempfile
 from mss import mss
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+import keyboard
 
 
 def handle_vlc_command(command):
     if command == 'play':
         pyautogui.press('space')
     elif command == 'prev':
-        pyautogui.press('p')
+        keyboard.send('p')
     elif command == 'stop':
-        pyautogui.press('s')
+        keyboard.send('s')
     elif command == 'next':
-        pyautogui.press('n')
+        keyboard.send('n')
     elif command == 'next_chapter':
-        pyautogui.hotkey('shift', 'n')
+        keyboard.send('shift+n')
     elif command == 'short_jump_forward':
         pyautogui.hotkey('alt', 'right')
     elif command == 'short_jump_backward':
@@ -38,13 +39,13 @@ def handle_vlc_command(command):
     elif command == 'vol_down':
         pyautogui.press('down')
     elif command == 'next_audio_track':
-        pyautogui.press('b')
+        keyboard.send('b')
     elif command == 'next_sub':
-        pyautogui.press('v')
+        keyboard.send('v')
     elif command == 'delay_sub':
-        pyautogui.press('g')
+        keyboard.send('g')
     elif command == 'rush_sub':
-        pyautogui.press('h')
+        keyboard.send('h')
     elif command == 'change_lang':
         pyautogui.hotkey('win', 'space')
 
@@ -102,13 +103,13 @@ def keyboard_command(key):
     elif key == "caps_lock":
         pyautogui.hotkey('capslock')
         return
-    pyautogui.press(str(key))
+    keyboard.send(str(key))
 
 
 def toggle_hotspot():
-    pyautogui.hotkey('win', 's')
+    keyboard.send('win+s')
     time.sleep(1)
-    pyautogui.hotkey('win', 'a')
+    keyboard.send('win+a')
     time.sleep(1)
     pyautogui.press('down')
     time.sleep(1)
@@ -120,9 +121,9 @@ def toggle_hotspot():
 
 
 def toggle_bluetooth():
-    pyautogui.hotkey('win', 's')
+    keyboard.send('win+s')
     time.sleep(1)
-    pyautogui.hotkey('win', 'a')
+    keyboard.send('win+a')
     time.sleep(1)
     pyautogui.press('right')
     time.sleep(1)
@@ -132,7 +133,7 @@ def toggle_bluetooth():
 
 
 def clean_screen():
-    pyautogui.hotkey('win', 's')
+    keyboard.send('win+s')
     time.sleep(2)
     pyautogui.press('esc')
 
