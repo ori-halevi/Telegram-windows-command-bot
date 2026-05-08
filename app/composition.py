@@ -1,0 +1,44 @@
+"""Composition root — wire every feature into the Application."""
+from __future__ import annotations
+
+import logging
+
+from telegram.ext import (
+    AIORateLimiter,
+    Application,
+    ApplicationBuilder,
+)
+
+from .core import router
+from .core.config import CONFIG, LOG_DIR
+from .core.errors import on_error
+from .features import ALL_FEATURES
+from .shared.logging import setup_logging
+
+log = logging.getLogger(__name__)
+
+
+def build_app() -> Application:
+    setup_logging(LOG_DIR, CONFIG.log_level)
+    app = (
+        ApplicationBuilder()
+        .token(CONFIG.bot_token)
+        .rate_limiter(AIORateLimiter())
+        .build()
+    )
+
+    # Each feature self-registers its commands, callbacks, and specialized message handlers.
+    for feature in ALL_FEATURES:
+        feature.register(app)
+
+    # Catch-all text/command router — added LAST so it doesn't shadow specific handlers.
+    router.register(app)
+
+    app.add_error_handler(on_error)
+    return app
+
+
+def run() -> None:
+    app = build_app()
+    log.info("[+] Bot starting (v2.1 — Feature-Sliced)")
+    app.run_polling(allowed_updates=None, drop_pending_updates=True)
