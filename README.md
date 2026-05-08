@@ -99,8 +99,8 @@ git clone https://github.com/ori-halevi/Telegram-windows-command-bot.git
 cd Telegram-windows-command-bot
 
 # 2. Create venv (Python 3.12 recommended)
-py -3.12 -m venv venv2
-.\venv2\Scripts\Activate.ps1
+py -3.12 -m venv venv
+.\venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip wheel
 pip install -r requirements.txt
 
@@ -154,7 +154,7 @@ OWNER_USERNAME=your_telegram_username   # without the @
 ### 4. Install dependencies
 
 ```powershell
-.\venv2\Scripts\Activate.ps1
+.\venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 ```
 
@@ -401,11 +401,11 @@ Or run the script form directly via a `.bat` shortcut placed in `shell:startup`.
 ## Building a standalone `.exe`
 
 ```powershell
-.\venv2\Scripts\Activate.ps1
+.\venv\Scripts\Activate.ps1
 pip install pyinstaller
 
 pyinstaller --onefile -w -i "bot.png" `
-  --paths "venv2\Lib\site-packages" `
+  --paths "venv\Lib\site-packages" `
   main.py
 
 # clean up
