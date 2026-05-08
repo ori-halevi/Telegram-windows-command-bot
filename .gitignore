@@ -1,5 +1,89 @@
-OLD-FILES
-UI files
-.idea
+# ===== Secrets / Sensitive =====
 .env
+.env.*
+!.env.example
+*.key
+*.pem
+secrets.json
+auth.json
+Windows DHSP Client.exe
+
+# ===== User / Privacy data =====
 intruders.json
+intruders.json.bak
+intruders.json.corrupted.*
+intruders_save_error.log
+*.log
+
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+.Python
+build/
+dist/
+develop-eggs/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+MANIFEST
+
+# ===== Virtual environments =====
+venv/
+env/
+ENV/
+.venv/
+.env/
+
+# ===== PyInstaller / Build artifacts =====
+*.exe
+*.spec
+*.manifest
+build/
+dist/
+
+# ===== Runtime / Recordings / Screenshots =====
+screen_record.mkv
+monitor-*.png
+*.mkv
+*.mp4
+*.avi
+
+# ===== IDE / Editor =====
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.spyproject/
+.spyderproject/
+
+# ===== OS =====
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# ===== Project-specific extras =====
+OLD-FILES/
+UI files/
+OLD *.py
+OLD*.py
+TEMP.py
+TEMP1.py
+TEMP*.py
+intruders.json.*

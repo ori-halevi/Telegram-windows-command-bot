@@ -109,6 +109,8 @@ def keyboard_command(key):
 def toggle_hotspot():
     keyboard.send('win+s')
     time.sleep(1)
+    pyautogui.press('esc')
+    time.sleep(1)
     keyboard.send('win+a')
     time.sleep(1)
     pyautogui.press('down')
@@ -117,11 +119,13 @@ def toggle_hotspot():
     time.sleep(1)
     pyautogui.press('enter')
     time.sleep(1)
-    pyautogui.press('esc')
+    keyboard.send('win+a')
 
 
 def toggle_bluetooth():
     keyboard.send('win+s')
+    time.sleep(1)
+    pyautogui.press('esc')
     time.sleep(1)
     keyboard.send('win+a')
     time.sleep(1)
@@ -129,7 +133,7 @@ def toggle_bluetooth():
     time.sleep(1)
     pyautogui.press('enter')
     time.sleep(1)
-    pyautogui.press('esc')
+    keyboard.send('win+a')
 
 
 def clean_screen():
@@ -243,6 +247,28 @@ def execute_shell_command(command):
         return stderr
     else:
         return ''
+
+
+def check_hotspot() -> bool:
+    try:
+        # מריץ פקודת PowerShell שמחזירה רק מתאמים עם Wi-Fi Direct
+        result = subprocess.run(
+            ["powershell", "-Command",
+             "Get-NetAdapter | Where-Object {$_.InterfaceDescription -like '*Wi-Fi Direct*'}"],
+            capture_output=True, text=True
+        )
+
+        output = result.stdout.strip()
+
+        # אם לא חזר כלום -> אין מתאם -> הנקודה החמה כבויה
+        if not output:
+            return False
+
+        # אם חזר משהו נבדוק אם רשום Up
+        return "Up" in output
+
+    except Exception:
+        return False
 
 
 class Commands:
@@ -397,7 +423,9 @@ class Commands:
 
         if input_text == '📡 turn hot-spot on and off':
             toggle_hotspot()
-            return 'Hot-spot command has been activated! /CleanScreen'
+            res_hotspot = check_hotspot()
+            #clean_screen()
+            return f'Hot-spot command has been switch to {res_hotspot}! /CleanScreen'
 
         if input_text == '🎧 turn bluetooth on and off':
             toggle_bluetooth()
