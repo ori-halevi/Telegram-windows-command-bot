@@ -1,6 +1,7 @@
 """Owner authentication, intruder logging, rate limiting."""
 from __future__ import annotations
 
+import json
 import logging
 import os
 import tempfile
@@ -54,7 +55,6 @@ def make_intruder_dict(chat) -> dict:
 
 def save_intruder_info(user_info: dict) -> None:
     """Atomic save with backup. Never raises — only logs."""
-    ts = time.strftime("%Y%m%d-%H%M%S")
     with _LOCK:
         try:
             INTRUDERS_PATH.parent.mkdir(parents=True, exist_ok=True)
@@ -87,7 +87,6 @@ def save_intruder_info(user_info: dict) -> None:
 
             fd, tmp = tempfile.mkstemp(dir=str(INTRUDERS_PATH.parent))
             try:
-                import json
                 with os.fdopen(fd, "w", encoding="utf-8") as f:
                     json.dump(intruders, f, indent=4, ensure_ascii=False)
                     f.flush()

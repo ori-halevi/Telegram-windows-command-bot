@@ -10,16 +10,18 @@ from telegram.ext import (
 )
 
 from .core import router
-from .core.config import CONFIG, LOG_DIR
+from .core.config import CONFIG, ICON_PATH, LOG_DIR
 from .core.errors import on_error
 from .features import ALL_FEATURES
 from .shared.logging import setup_logging
+from .shared.window_icon import set_console_icon
 
 log = logging.getLogger(__name__)
 
 
 def build_app() -> Application:
     setup_logging(LOG_DIR, CONFIG.log_level)
+    set_console_icon(ICON_PATH)
     app = (
         ApplicationBuilder()
         .token(CONFIG.bot_token)

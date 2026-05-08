@@ -10,6 +10,4 @@ numpy>=2.0
 PyGetWindow>=0.0.9
 comtypes>=1.4
 pycaw>=20240210
-sounddevice>=0.5
-scipy>=1.13
 pillow>=10.4

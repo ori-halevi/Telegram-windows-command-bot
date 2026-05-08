@@ -2,14 +2,31 @@
 from __future__ import annotations
 
 import os
+import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 
 from dotenv import load_dotenv
 
-ROOT = Path(__file__).resolve().parent.parent.parent
+
+def _project_root() -> Path:
+    """Return the directory holding .env / data / logs.
+
+    - When running as a script (`python main.py`): three levels up from this
+      file (i.e. the project root containing main.py).
+    - When running as a PyInstaller one-file .exe: the directory of the .exe
+      itself. (`__file__` points into the temp extraction dir, so we use
+      `sys.executable`'s parent.)
+    """
+    if getattr(sys, "frozen", False):
+        return Path(sys.executable).resolve().parent
+    return Path(__file__).resolve().parent.parent.parent
+
+
+ROOT = _project_root()
 DATA_DIR = ROOT / "data"
 LOG_DIR = ROOT / "logs"
+ICON_PATH = ROOT / "bot.ico"
 DATA_DIR.mkdir(exist_ok=True)
 LOG_DIR.mkdir(exist_ok=True)
 

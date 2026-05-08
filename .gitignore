@@ -54,8 +54,6 @@ build/
 dist/
 
 # ===== Runtime / Recordings / Screenshots =====
-screen_record.mkv
-monitor-*.png
 *.mkv
 *.mp4
 *.avi
@@ -79,11 +77,4 @@ $RECYCLE.BIN/
 .LSOverride
 
 # ===== Project-specific extras =====
-OLD-FILES/
-UI files/
-OLD *.py
-OLD*.py
-TEMP.py
-TEMP1.py
-TEMP*.py
 intruders.json.*
