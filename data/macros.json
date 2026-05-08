@@ -1,0 +1,44 @@
+{
+  "task_manager": [
+    "ctrl+shift+esc"
+  ],
+  "lock": [
+    "win+l"
+  ],
+  "show_desktop": [
+    "win+d"
+  ],
+  "explorer": [
+    "win+e"
+  ],
+  "run": [
+    "win+r"
+  ],
+  "snip": [
+    "win+shift+s"
+  ],
+  "settings": [
+    "win+i"
+  ],
+  "search": [
+    "win+s"
+  ],
+  "action_center": [
+    "win+a"
+  ],
+  "switcher": [
+    "alt+tab"
+  ],
+  "close_window": [
+    "alt+f4"
+  ],
+  "new_desktop": [
+    "ctrl+win+d"
+  ],
+  "next_desktop": [
+    "ctrl+win+right"
+  ],
+  "prev_desktop": [
+    "ctrl+win+left"
+  ]
+}
