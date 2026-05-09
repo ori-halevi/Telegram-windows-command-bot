@@ -18,6 +18,7 @@ WEBCAM = "📷 Webcam"
 KEYS = "⌨️ Keys"
 BUILDER = "⌨️ Builder"
 MACROS = "📝 Macros"
+RECORDER = "📼 Recorder"
 SWITCHER = "🔀 Switcher"
 WINDOWS = "🪟 Windows"
 PROCESSES = "📄 Processes"
@@ -33,6 +34,7 @@ LAYOUT = [
     [VOLUME, BRIGHTNESS],
     [SCREENSHOT, RECORD, WEBCAM],
     [KEYS, BUILDER, MACROS],
+    [RECORDER],
     [SWITCHER, WINDOWS, PROCESSES],
     [VLC, NETFLIX],
     [FILES, CLIPBOARD],

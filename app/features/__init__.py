@@ -11,6 +11,7 @@ from . import (
     start_help,           # /start, /help, /about, /release_keys
     keys,                 # ⌨️ Builder, ⌨️ Keys, k <combo>, type <text>
     macros,               # 📝 Macros, /macro, /save_macro, ...
+    recorder,             # 📼 Recorder — record & replay mouse/keyboard macros
     switcher,             # 🔀 Switcher (interactive Alt+Tab)
     system,               # 📊 System info, 🔋 Power, lock/sleep/etc
     audio,                # 🔊 Volume
@@ -27,7 +28,7 @@ from . import (
 )
 
 ALL_FEATURES = [
-    start_help, keys, macros, switcher, system, audio, brightness,
+    start_help, keys, macros, recorder, switcher, system, audio, brightness,
     screen, webcam, network, media, mouse, windows_proc, files,
     clipboard, shell,
 ]
