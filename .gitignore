@@ -83,3 +83,6 @@ intruders.json.*
 data/recordings.json
 data/macros.json
 data/key_builder_state.json
+
+# ===== Claude Code (AI assistant settings) =====
+.claude/
