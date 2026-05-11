@@ -1,6 +1,8 @@
 """Recorder business logic — capture, save, and replay macros. No Telegram imports."""
 from __future__ import annotations
 
+import ctypes
+import io
 import logging
 import re
 import threading
@@ -20,6 +22,10 @@ log = logging.getLogger(__name__)
 
 _LOCK = threading.RLock()
 RECORDINGS_PATH = DATA_DIR / "recordings.json"
+
+# Disable pyautogui fail-safe for replay (corners trigger it during normal use)
+pyautogui.FAILSAFE = False
+pyautogui.PAUSE = 0  # remove built-in inter-call sleep
 
 _PYNPUT_TO_PYAUTOGUI: dict[str, str] = {
     "ctrl_l": "ctrlleft", "ctrl_r": "ctrlright",
@@ -43,6 +49,22 @@ def _norm_key(k: str) -> str:
     return k
 
 
+def _dpi_scale() -> float:
+    """Return the DPI scaling factor on Windows (e.g. 1.25 for 125%)."""
+    try:
+        awareness = ctypes.c_int()
+        ctypes.windll.shcore.GetProcessDpiAwareness(0, ctypes.byref(awareness))
+        if awareness.value == 0:
+            # Process is not DPI-aware — coordinates are scaled by the OS
+            dc = ctypes.windll.user32.GetDC(0)
+            dpi = ctypes.windll.gdi32.GetDeviceCaps(dc, 88)  # LOGPIXELSX
+            ctypes.windll.user32.ReleaseDC(0, dc)
+            return dpi / 96.0
+    except Exception:
+        pass
+    return 1.0
+
+
 def _load_recordings() -> dict[str, Any]:
     return read_json(RECORDINGS_PATH, {})
 
@@ -52,6 +74,7 @@ def _load_recordings() -> dict[str, Any]:
 def start_recording(chat_id: int) -> None:
     state.begin_recording(chat_id)
     last = [time.monotonic()]
+    scale = _dpi_scale()
 
     def _delta() -> float:
         now = time.monotonic()
@@ -59,11 +82,17 @@ def start_recording(chat_id: int) -> None:
         last[0] = now
         return d
 
+    def _phys(v: int) -> int:
+        """Convert OS-virtual coordinate to physical pixel coordinate."""
+        return round(v * scale)
+
     def on_move(x: int, y: int) -> None:
         if state.get_status(chat_id) != "recording":
             return
         try:
-            state.append_event(chat_id, {"type": "move", "x": x, "y": y, "delay": _delta()})
+            state.append_event(chat_id, {
+                "type": "move", "x": _phys(x), "y": _phys(y), "delay": _delta(),
+            })
         except Exception:
             log.exception("recorder on_move")
 
@@ -72,7 +101,7 @@ def start_recording(chat_id: int) -> None:
             return
         try:
             state.append_event(chat_id, {
-                "type": "click", "x": x, "y": y,
+                "type": "click", "x": _phys(x), "y": _phys(y),
                 "button": button.name, "pressed": pressed, "delay": _delta(),
             })
         except Exception:
@@ -83,7 +112,8 @@ def start_recording(chat_id: int) -> None:
             return
         try:
             state.append_event(chat_id, {
-                "type": "scroll", "x": x, "y": y, "dx": dx, "dy": dy, "delay": _delta(),
+                "type": "scroll", "x": _phys(x), "y": _phys(y),
+                "dx": dx, "dy": dy, "delay": _delta(),
             })
         except Exception:
             log.exception("recorder on_scroll")
@@ -129,8 +159,6 @@ def finish_recording(chat_id: int) -> None:
 def save_recording(name: str, events: list[dict]) -> str:
     if not events:
         return "❌ Nothing was captured. Start a new recording."
-    if not re.match(r"^[\w\-]{1,64}$", name):
-        return "❌ Invalid name. Use letters, digits, _ or - (max 64 chars)."
     w, h = pyautogui.size()
     rec = {
         "resolution": [w, h],
@@ -158,7 +186,70 @@ def delete_recording(name: str) -> str:
     return f"🗑 Deleted '{name}'"
 
 
+# ---------- Status / screenshot ----------
+
+def mouse_status_screenshot() -> tuple[str, bytes]:
+    """Return (status_text, png_bytes) with current mouse position marked."""
+    import mss
+    import mss.tools
+    from PIL import Image, ImageDraw
+
+    x, y = pyautogui.position()
+    sw, sh = pyautogui.size()
+
+    with mss.mss() as sct:
+        monitor = sct.monitors[0]  # full virtual screen
+        sct_img = sct.grab(monitor)
+        img = Image.frombytes("RGB", sct_img.size, sct_img.bgra, "raw", "BGRX")
+
+    # Scale image down to max 1280px wide for Telegram
+    max_w = 1280
+    if img.width > max_w:
+        ratio = max_w / img.width
+        img = img.resize((max_w, int(img.height * ratio)), Image.LANCZOS)
+        sx = x * ratio
+        sy = y * ratio
+    else:
+        sx, sy = x, y
+
+    draw = ImageDraw.Draw(img)
+    r = 12
+    draw.ellipse([sx - r, sy - r, sx + r, sy + r], outline="red", width=3)
+    draw.line([sx - r * 2, sy, sx + r * 2, sy], fill="red", width=2)
+    draw.line([sx, sy - r * 2, sx, sy + r * 2], fill="red", width=2)
+
+    buf = io.BytesIO()
+    img.save(buf, format="PNG")
+    buf.seek(0)
+    text = f"🖱 Mouse position: ({x}, {y})\n📐 Screen: {sw}×{sh}"
+    return text, buf.read()
+
+
 # ---------- Replay ----------
+
+# Per-chat pause flag: chat_id -> threading.Event (set = running, clear = paused)
+_REPLAY_EVENTS: dict[int, threading.Event] = {}
+_REPLAY_LOCK = threading.Lock()
+
+
+def get_or_create_replay_event(chat_id: int) -> threading.Event:
+    with _REPLAY_LOCK:
+        if chat_id not in _REPLAY_EVENTS:
+            ev = threading.Event()
+            ev.set()
+            _REPLAY_EVENTS[chat_id] = ev
+        return _REPLAY_EVENTS[chat_id]
+
+
+def pause_replay(chat_id: int) -> str:
+    ev = get_or_create_replay_event(chat_id)
+    if ev.is_set():
+        ev.clear()
+        return "⏸ Replay paused"
+    else:
+        ev.set()
+        return "▶️ Replay resumed"
+
 
 def _dispatch_event(ev: dict) -> None:
     t = ev.get("type")
@@ -185,7 +276,7 @@ def _dispatch_event(ev: dict) -> None:
             log.debug("replay: unknown key %r — skipped", k)
 
 
-def replay_recording(name: str) -> str:
+def replay_recording(chat_id: int, name: str) -> str:
     data = _load_recordings()
     rec = data.get(name)
     if not rec:
@@ -203,15 +294,26 @@ def replay_recording(name: str) -> str:
     if not events:
         return f"❌ Recording '{name}' is empty"
 
+    pause_ev = get_or_create_replay_event(chat_id)
+    pause_ev.set()  # ensure running at start
+
     try:
         for ev in events:
+            # Wait while paused
+            pause_ev.wait()
             raw = ev.get("delay", 0.0)
-            adjusted = raw + max(0.2, raw * 0.20)
+            # Only add margin to delays > 50ms to avoid inflating fast mouse moves
+            if raw > 0.05:
+                adjusted = raw + max(0.05, raw * 0.10)
+            else:
+                adjusted = raw
             if adjusted > 0:
                 time.sleep(adjusted)
             _dispatch_event(ev)
     except Exception as e:
         log.exception("replay_recording failed for %r", name)
         return f"❌ Replay failed: {e}"
+    finally:
+        pause_ev.set()  # always resume on exit
 
     return f"✅ Replayed '{name}' — {len(events)} event(s)"

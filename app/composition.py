@@ -8,6 +8,7 @@ from telegram.ext import (
     Application,
     ApplicationBuilder,
 )
+from telegram.request import HTTPXRequest
 
 from .core import router
 from .core.config import CONFIG, ICON_PATH, LOG_DIR
@@ -22,9 +23,11 @@ log = logging.getLogger(__name__)
 def build_app() -> Application:
     setup_logging(LOG_DIR, CONFIG.log_level)
     set_console_icon(ICON_PATH)
+    request = HTTPXRequest(connect_timeout=30, read_timeout=30)
     app = (
         ApplicationBuilder()
         .token(CONFIG.bot_token)
+        .request(request)
         .rate_limiter(AIORateLimiter())
         .build()
     )

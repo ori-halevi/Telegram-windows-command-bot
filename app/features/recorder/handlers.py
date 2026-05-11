@@ -1,10 +1,11 @@
 """Recorder handlers — callbacks, name-input intercept, and text router entry."""
 from __future__ import annotations
 
+import asyncio
 import logging
-import re
 
 from telegram import Update
+from telegram.error import BadRequest
 from telegram.ext import Application, CallbackQueryHandler, ContextTypes, MessageHandler, filters
 
 from ...core import menu
@@ -14,6 +15,8 @@ from ...shared.telegram_utils import to_thread
 from . import service, state, ui
 
 log = logging.getLogger(__name__)
+
+_NAME_RE_STR = r"^[\w֐-׿‏‎\-]{1,64}$"
 
 
 def match_text(text: str, chat_id: int) -> TextResult | None:
@@ -25,6 +28,15 @@ def match_text(text: str, chat_id: int) -> TextResult | None:
         reply_markup=ui.recorder_menu(recs),
         parse_mode="Markdown",
     )
+
+
+async def _safe_edit(q, text: str, **kwargs) -> None:
+    """Edit message text, silently ignoring 'not modified' errors."""
+    try:
+        await q.edit_message_text(text, **kwargs)
+    except BadRequest as e:
+        if "not modified" not in str(e).lower():
+            raise
 
 
 async def _on_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -42,9 +54,9 @@ async def _on_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     await q.answer()
 
     try:
-        if sub == "menu" or sub == "back":
+        if sub in ("menu", "back"):
             recs = await to_thread(service.list_recordings)
-            await q.edit_message_text(
+            await _safe_edit(q,
                 ui.recorder_caption(recs),
                 reply_markup=ui.recorder_menu(recs),
                 parse_mode="Markdown",
@@ -55,7 +67,7 @@ async def _on_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
                 await q.answer("⚠️ Already recording!", show_alert=True)
                 return
             await to_thread(service.start_recording, chat_id)
-            await q.edit_message_text(
+            await _safe_edit(q,
                 ui.recording_active_caption(),
                 reply_markup=ui.recording_active_menu(),
                 parse_mode="Markdown",
@@ -68,7 +80,7 @@ async def _on_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
             state.set_idle(chat_id)
             state.clear_events(chat_id)
             recs = await to_thread(service.list_recordings)
-            await q.edit_message_text(
+            await _safe_edit(q,
                 ui.recorder_caption(recs),
                 reply_markup=ui.recorder_menu(recs),
                 parse_mode="Markdown",
@@ -78,8 +90,8 @@ async def _on_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
             if state.get_status(chat_id) != "recording":
                 return
             await to_thread(service.finish_recording, chat_id)
-            await q.edit_message_text(
-                "💾 Recording stopped.\n\nSend me a name for this macro (letters, digits, _ or -):"
+            await _safe_edit(q,
+                "💾 Recording stopped.\n\nSend me a name for this macro:"
             )
 
         elif sub == "abort":
@@ -87,28 +99,65 @@ async def _on_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
             state.set_idle(chat_id)
             state.clear_events(chat_id)
             recs = await to_thread(service.list_recordings)
-            await q.edit_message_text(
+            await _safe_edit(q,
                 ui.recorder_caption(recs),
                 reply_markup=ui.recorder_menu(recs),
                 parse_mode="Markdown",
             )
 
         elif sub == "play" and len(parts) > 2:
-            name = parts[2]
-            result = await to_thread(service.replay_recording, name)
-            await q.answer(result[:200], show_alert=True)
+            name = ":".join(parts[2:])
+            # Show replay menu immediately, then run replay in background thread
+            await _safe_edit(q,
+                f"▶️ Replaying *{name}*…",
+                reply_markup=ui.replay_active_menu(name),
+                parse_mode="Markdown",
+            )
+
+            async def _do_replay():
+                try:
+                    result = await to_thread(service.replay_recording, chat_id, name)
+                    recs = await to_thread(service.list_recordings)
+                    try:
+                        await q.edit_message_text(
+                            f"{result}\n\n{ui.recorder_caption(recs)}",
+                            reply_markup=ui.recorder_menu(recs),
+                            parse_mode="Markdown",
+                        )
+                    except BadRequest:
+                        pass
+                except Exception:
+                    log.exception("background replay task failed for %r", name)
+
+            asyncio.ensure_future(_do_replay())
+
+        elif sub == "pause" and len(parts) > 2:
+            name = ":".join(parts[2:])
+            result = await to_thread(service.pause_replay, chat_id)
+            await q.answer(result, show_alert=False)
+
+        elif sub == "status":
+            text, png = await to_thread(service.mouse_status_screenshot)
+            await update.effective_message.reply_photo(photo=png, caption=text)
 
         elif sub == "del" and len(parts) > 2:
-            name = parts[2]
+            name = ":".join(parts[2:])
             msg = await to_thread(service.delete_recording, name)
             recs = await to_thread(service.list_recordings)
-            await q.edit_message_text(
+            await _safe_edit(q,
                 ui.recorder_caption(recs),
                 reply_markup=ui.recorder_menu(recs),
                 parse_mode="Markdown",
             )
             await q.answer(msg[:200])
 
+    except BadRequest as e:
+        if "not modified" not in str(e).lower():
+            log.exception("recorder callback error")
+            try:
+                await q.answer(f"❌ {e}"[:200], show_alert=True)
+            except Exception:
+                pass
     except Exception as e:
         log.exception("recorder callback error")
         try:
@@ -126,9 +175,10 @@ async def _on_name_input(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         return  # not our turn — let the update propagate to group 0
 
     name = (update.message.text or "").strip()
-    if not re.match(r"^[\w\-]{1,64}$", name):
+    import re
+    if not re.match(_NAME_RE_STR, name):
         await update.message.reply_text(
-            "❌ Invalid name. Use only letters, digits, _ or - (max 64 chars). Try again:"
+            "❌ Invalid name. Use letters (including Hebrew), digits, _ or - (max 64 chars). Try again:"
         )
         return  # stay in awaiting_name
 

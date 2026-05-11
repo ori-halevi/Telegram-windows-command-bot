@@ -30,6 +30,9 @@ def recorder_menu(recordings: dict[str, Any]) -> InlineKeyboardMarkup:
         ])
     rows.append([
         IB("▶️ New Recording", callback_data="rec:new"),
+        IB("🖱 Status", callback_data="rec:status"),
+    ])
+    rows.append([
         IB("⬅️ Back", callback_data="rec:back"),
     ])
     return InlineKeyboardMarkup(rows)
@@ -40,4 +43,11 @@ def recording_active_menu() -> InlineKeyboardMarkup:
         [IB("⏹️ Stop (discard)", callback_data="rec:stop")],
         [IB("💾 Finish & Save", callback_data="rec:save")],
         [IB("⬅️ Abort", callback_data="rec:abort")],
+    ])
+
+
+def replay_active_menu(name: str) -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup([
+        [IB("⏸ Pause / ▶️ Resume", callback_data=f"rec:pause:{name}")],
+        [IB("🖱 Status", callback_data="rec:status")],
     ])
