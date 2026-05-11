@@ -78,3 +78,8 @@ $RECYCLE.BIN/
 
 # ===== Project-specific extras =====
 intruders.json.*
+
+# ===== User data (local to each machine) =====
+data/recordings.json
+data/macros.json
+data/key_builder_state.json
