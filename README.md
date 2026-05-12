@@ -43,6 +43,7 @@
 - [Detailed setup](#detailed-setup)
 - [Usage](#usage)
   - [Main menu](#main-menu)
+  - [Recorder](#recorder)
   - [Keyboard combos — three ways](#keyboard-combos--three-ways)
   - [Interactive Alt+Tab switcher](#interactive-alttab-switcher)
   - [Free-text commands](#free-text-commands)
@@ -68,6 +69,7 @@ It is built around a single killer primitive — **arbitrary keyboard combinatio
   <tr>
     <td valign="top">
 
+- **📼 Record & Replay macros** — record any sequence of real mouse movements, clicks, scrolls, and keystrokes; save it under a name; replay it on demand with one tap. DPI-aware coordinate mapping, resolution guard, and a live Pause/Resume button during playback. See [Recorder](#recorder) below.
 - **🎹 Flexible keyboard combos** — send *any* hotkey three different ways:
   - Free-text: `k ctrl+alt+del`, `k win+shift+s`, `k alt+f4` …
   - Interactive **Combo Builder** — toggleable L/R modifier pills (`Ctrl←`, `Win→`, `Alt←`, `Shift→`, …) plus a click-to-fire key grid; tap **▶ Fire mods alone** to press just `Win` or just `Ctrl`.
@@ -169,6 +171,7 @@ The bot uses:
 | `psutil` | processes, system metrics |
 | `pygetwindow` | window list / focus / close |
 | `pycaw`, `comtypes` | master volume |
+| `pynput` | OS-level mouse & keyboard capture for the Recorder |
 | (PowerShell + WMI) | screen brightness |
 
 ### 5. Run
@@ -197,6 +200,7 @@ After `/start`, a reply keyboard appears with these groups:
 🔊 Volume       | 💡 Brightness
 📸 Screenshot   | 🎥 Record screen | 📷 Webcam
 ⌨️ Keys         | ⌨️ Builder       | 📝 Macros
+📼 Recorder
 🔀 Switcher     | 🪟 Windows       | 📄 Processes
 🎦 VLC          | 🎬 Netflix
 📂 Files        | ✂ Clipboard
@@ -211,6 +215,33 @@ The welcome message also includes a link back to this repository so anyone you a
     </td>
   </tr>
 </table>
+
+### Recorder
+
+Tap **📼 Recorder** in the main menu to open the recording interface.
+
+**Recording a macro**
+
+1. Tap **▶️ New Recording** — the message switches to *🔴 Recording Mode*.
+2. Perform any actions on the PC: move the mouse, click, scroll, type.
+3. Tap **💾 Finish & Save** — the bot stops capturing and asks for a name (supports Hebrew and Latin characters).
+4. Type a name — the macro is saved to `data/recordings.json`.
+
+**Replaying**
+
+Tap the `▶ <name>` button next to any saved macro. Replay starts immediately in the background. During playback you can:
+
+| Button | Action |
+| --- | --- |
+| ⏸ Pause / ▶️ Resume | freeze/unfreeze the replay mid-sequence |
+| 🖱 Status | take a screenshot with the current mouse position marked in red |
+
+**Safety features**
+
+- **Resolution guard** — the resolution at record time is stored alongside the events. If the current resolution differs, replay is refused with an error message, preventing misclicks on a different layout.
+- **DPI scaling** — coordinates are mapped from OS-virtual to physical pixels at record time so replay lands on the correct pixel even on 125 % / 150 % HiDPI displays.
+- **Timing margin** — delays shorter than 50 ms are replayed as-is; longer pauses get a small +10 % buffer to account for UI load time variance.
+- **Discard at any time** — tap ⏹️ Stop (discard) or ⬅️ Abort to cancel recording without saving anything.
 
 ### Keyboard combos — three ways
 
@@ -350,7 +381,8 @@ project/
 │       ├── clipboard/             # ✂
 │       ├── network/               # 📡 / 🎧 / 📶 / ip
 │       ├── shell/                 # cmd / ps1 / launch / url
-│       └── media/                 # 🎦 VLC + 🎬 Netflix
+│       ├── media/                 # 🎦 VLC + 🎬 Netflix
+│       └── recorder/              # 📼 record & replay mouse/keyboard macros
 │
 ├── data/                          # persistent JSON state (atomic writes)
 │   ├── key_builder_state.json
@@ -423,7 +455,7 @@ The single `.exe` will still need `.env` and the `data/` and `logs/` folders nex
 > בוט טלגרם ששולט על מחשב Windows מרחוק.
 
 **מה זה?**
-שולחים הודעות לבוט בטלגרם — והמחשב מבצע את הפקודות. שילוב מקשים כלשהו, צילומי מסך, נעילה / שינה / כיבוי, שליטה ב־VLC ובנטפליקס, קריאת פרוצסים, גלישה בקבצים, הקלטת מסך ועוד.
+שולחים הודעות לבוט בטלגרם — והמחשב מבצע את הפקודות. שילוב מקשים כלשהו, צילומי מסך, נעילה / שינה / כיבוי, שליטה ב־VLC ובנטפליקס, קריאת פרוצסים, גלישה בקבצים, הקלטת מסך, **הקלטה וניגון מחדש של מאקרו עכבר/מקלדת** ועוד.
 
 **הפיצ'ר המרכזי — שילובי מקשים גמישים**
 אפשר לשלוח כל קומבינציה: `k ctrl+alt+del`, `k win+shift+s`, `k alt+f4`. אם לא זוכרים את התחביר — לוחצים על **⌨️ Builder** ובונים את הקומבינציה בלחיצות (יש Ctrl/Shift/Alt/Win לשני הצדדים, ימין ושמאל). אפשר גם לשמור macros עם שם:
@@ -432,6 +464,9 @@ The single `.exe` will still need `.env` and the `data/` and `logs/` folders nex
 /save_macro snip win+shift+s
 /macro snip
 ```
+
+**הקלטה וניגון מחדש של מאקרו 📼**
+לוחצים על **📼 Recorder** בתפריט, מתחילים הקלטה, מבצעים כל פעולה על המחשב (עכבר, קלידים, גלילה), לוחצים **💾 Finish & Save** ונותנים שם. בניגון חוזר: הבוט בודק שהרזולוציה זהה, מפעיל את הרצף עם מרווח בטיחות קטן, ומאפשר **השהייה/חידוש** בזמן ריצה.
 
 **מתג חלונות אינטראקטיבי 🔀**
 כפתור **Switcher** מדמה לחיצה ארוכה על Alt+Tab — הבוט מחזיק את Alt לחוץ, אתה לוחץ `Tab+1` או `Tab+5` בטלגרם, מקבל צילום מסך מעודכן של מתג החלונות, ובוחר ✅ Commit להחליף לחלון המסומן.
