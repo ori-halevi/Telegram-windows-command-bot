@@ -39,8 +39,9 @@ def _current_brightness_int() -> int | None:
 def set_brightness(percent: int) -> str:
     percent = max(0, min(100, int(percent)))
     out = _ps(
-        f"(Get-CimInstance -Namespace root/wmi -ClassName WmiMonitorBrightnessMethods "
-        f"-ErrorAction Stop).WmiSetBrightness(1, {percent}) | Out-Null; 'ok'"
+        f"Get-CimInstance -Namespace root/wmi -ClassName WmiMonitorBrightnessMethods "
+        f"-ErrorAction Stop | Invoke-CimMethod -MethodName WmiSetBrightness "
+        f"-Arguments @{{Timeout=1; Brightness={percent}}} | Out-Null; 'ok'"
     )
     if out == "ok":
         return f"💡 Brightness set to {percent}%"

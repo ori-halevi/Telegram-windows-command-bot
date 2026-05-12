@@ -12,7 +12,7 @@ from telegram.request import HTTPXRequest
 
 from .core import router
 from .core.config import CONFIG, ICON_PATH, LOG_DIR
-from .core.errors import on_error
+from .core.errors import register_error_handlers
 from .features import ALL_FEATURES
 from .shared.logging import setup_logging
 from .shared.window_icon import set_console_icon
@@ -39,7 +39,7 @@ def build_app() -> Application:
     # Catch-all text/command router — added LAST so it doesn't shadow specific handlers.
     router.register(app)
 
-    app.add_error_handler(on_error)
+    register_error_handlers(app)
     return app
 
 
