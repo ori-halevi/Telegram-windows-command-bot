@@ -14,4 +14,5 @@ def power_menu() -> InlineKeyboardMarkup:
          IB("⛔ Shutdown", callback_data="power:shutdown")],
         [IB("✋ Abort shutdown", callback_data="power:abort"),
          IB("⚠ Screen status", callback_data="power:status")],
+        [IB("🔋 Suspend states", callback_data="power:states")],
     ])

@@ -50,7 +50,7 @@ HELP_TEXT = (
     "• ⌨️ Builder — toggle modifiers (L/R) and tap a key\n"
     "• 🔀 Switcher — interactive Alt+Tab with live screenshots\n\n"
     "*Macros:* `/macro <name>`, `/save_macro <n> <combo>[;<combo>]`, `/list_macros`\n\n"
-    "*System:* `info`, `lock`, `sleep`, `hibernate`, `shutdown [s]`, `restart [s]`, `abort_shutdown`\n"
+    "*System:* `info`, `lock`, `sleep`, `hibernate`, `power_states`, `shutdown [s]`, `restart [s]`, `abort_shutdown`\n"
     "*Audio:* `vol <0-100>`, `mute`\n"
     "*Brightness:* `bright <0-100>`\n"
     "*Mouse:* `mouse pos`, `mouse move x y`, `mouse click [left|right]`, `mouse scroll N`\n"

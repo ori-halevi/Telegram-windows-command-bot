@@ -19,6 +19,7 @@ _POWER_CALLBACKS = {
     "shutdown": service.shutdown_pc,
     "abort": service.abort_shutdown,
     "status": service.screen_status,
+    "states": service.power_states,
 }
 
 
@@ -53,6 +54,8 @@ def match_text(text: str, chat_id: int) -> TextResult | None:
         return TextResult(text=service.restart_pc(d))
     if verb == "abort_shutdown":
         return TextResult(text=service.abort_shutdown())
+    if verb in ("power_states", "sleep_states"):
+        return TextResult(text=service.power_states())
     if verb in ("status", "screen_status"):
         return TextResult(text=service.screen_status())
     return None

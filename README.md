@@ -322,7 +322,8 @@ Each tap **edits the same photo message in-place** with a fresh screenshot, so y
 | `k <combo>` / `keys <combo>` / `hotkey <combo>` | press an arbitrary key combination |
 | `type <text>` / `t <text>` | type/paste arbitrary Unicode text |
 | `info` | system info (CPU, RAM, disks, uptime, battery) |
-| `lock` / `sleep` / `hibernate` | quick power actions |
+| `lock` / `sleep` / `hibernate` | quick power actions — `sleep` is real S3 standby (session in RAM), `hibernate` is S4 (RAM written to `hiberfil.sys`, machine powers off) |
+| `power_states` | show whether sleep / hibernate are available on this PC |
 | `shutdown [N]` / `restart [N]` / `abort_shutdown` | scheduled power (default 5 s delay) |
 | `vol [0-100]` / `mute` | master volume / toggle mute |
 | `bright [0-100]` | screen brightness |
