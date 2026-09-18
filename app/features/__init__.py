@@ -24,11 +24,12 @@ from . import (
     windows_proc,         # 🪟 Windows, 📄 Processes, focus/close/kill/ps
     files,                # 📂 Files, ls/cd/pwd/download
     clipboard,            # ✂ Clipboard, copy/paste
+    launchers,            # 🚀 Launchers — run anything dropped in the launchers folder
     shell,                # cmd/ps1/launch/url
 )
 
 ALL_FEATURES = [
     start_help, keys, macros, recorder, switcher, system, audio, brightness,
     screen, webcam, network, media, mouse, windows_proc, files,
-    clipboard, shell,
+    clipboard, launchers, shell,
 ]

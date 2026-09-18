@@ -26,6 +26,7 @@ VLC = "🎦 VLC"
 NETFLIX = "🎬 Netflix"
 FILES = "📂 Files"
 CLIPBOARD = "✂ Clipboard"
+LAUNCHERS = "🚀 Launchers"
 HELP = "💡 Help"
 
 LAYOUT = [
@@ -38,7 +39,7 @@ LAYOUT = [
     [SWITCHER, WINDOWS, PROCESSES],
     [VLC, NETFLIX],
     [FILES, CLIPBOARD],
-    [HELP],
+    [LAUNCHERS, HELP],
 ]
 
 

@@ -46,6 +46,7 @@
   - [Recorder](#recorder)
   - [Keyboard combos — three ways](#keyboard-combos--three-ways)
   - [Interactive Alt+Tab switcher](#interactive-alttab-switcher)
+  - [Launchers](#launchers)
   - [Free-text commands](#free-text-commands)
 - [Architecture](#architecture)
 - [Security](#security)
@@ -315,6 +316,17 @@ Then:
 
 Each tap **edits the same photo message in-place** with a fresh screenshot, so you watch the switcher overlay update like a real keyboard. If the switcher is left active idle for 120 seconds, the next interaction auto-releases Alt to avoid a stuck modifier. You can also send `/release_keys` at any time as a manual safety net.
 
+### Launchers
+
+Tap **🚀 Launchers** to get one button per item in the launchers folder. The default folder is `launchers\` in the project; set `LAUNCHERS_DIR` in `.env` to use another one. Tapping a button runs the item exactly as a double-click would. `.ps1` files are an exception: a double-click would open them in Notepad, so the bot executes them.
+
+- **Anything goes:** `.lnk` shortcuts, `.bat`/`.cmd`/`.ps1` scripts, `.exe`, `.url`, documents.
+- **Subfolders** become sub-menus with ⬅ Back.
+- **Live:** the folder is re-read every time, so there is nothing to restart or register.
+- **Order and icons come from file names:** `01 🟢 Start Jitsi.lnk` sorts first and shows as `🟢 Start Jitsi`.
+- **Text:** `go <name>` runs an item by exact name or by a unique part of its name, e.g. `go stop`.
+- **Admin items:** shortcuts marked *Run as administrator* need the bot to run elevated (see [Auto-start](#auto-start-on-boot-windows-task-scheduler)). Otherwise the bot warns you that a UAC prompt is waiting on the screen.
+
 ### Free-text commands
 
 | Command | Meaning |
@@ -420,16 +432,17 @@ project/
 
 ## Auto-start on boot (Windows Task Scheduler)
 
-Build a one-file `.exe` (see next section), then register it to launch at user logon:
+Run once (it asks for UAC itself):
 
 ```powershell
-SCHTASKS /CREATE /SC ONLOGON `
-  /TN "Telegram-Windows-Command-Bot" `
-  /TR '"C:\path\to\Telegram windows command bot.exe"' `
-  /RL HIGHEST
+powershell -ExecutionPolicy Bypass -File tools\install_autostart.ps1
 ```
 
-Or run the script form directly via a `.bat` shortcut placed in `shell:startup`.
+It registers a Task Scheduler task that starts `venv\Scripts\pythonw.exe main.py` **elevated** at logon, in your interactive session, with no execution time limit and no battery restrictions. It archives an old `activate bot.bat` from the Startup folder into `legacy\`, then restarts the bot through the task. Remove it with `-Uninstall`.
+
+Why not the Startup folder? Items there never run elevated. Admin-only programs launched by the bot (see [Launchers](#launchers)) would then wait on a UAC prompt that nobody can click remotely.
+
+> Note: when the bot runs elevated, everything it launches runs elevated too (`launch`, `cmd`, launchers).
 
 ## Building a standalone `.exe`
 

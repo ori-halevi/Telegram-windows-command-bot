@@ -49,6 +49,7 @@ class Config:
     rate_limit_per_minute: int = 60
     screen_record_default_seconds: int = 30
     log_level: str = "INFO"
+    launchers_dir: Path = ROOT / "launchers"
 
     @property
     def all_owner_chat_ids(self) -> set[int]:
@@ -80,6 +81,9 @@ def _load() -> Config:
         rate_limit_per_minute=int(os.getenv("RATE_LIMIT_PER_MINUTE", "60")),
         screen_record_default_seconds=int(os.getenv("SCREEN_RECORD_SECONDS", "30")),
         log_level=os.getenv("LOG_LEVEL", "INFO"),
+        launchers_dir=Path(os.path.expandvars(
+            os.getenv("LAUNCHERS_DIR") or str(ROOT / "launchers")
+        )).expanduser(),
     )
 
 

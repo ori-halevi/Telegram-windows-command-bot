@@ -59,6 +59,7 @@ HELP_TEXT = (
     "*Files:* `ls [path]`, `pwd`, `cd <path>`, `download <path>`\n"
     "*Network:* `wifi`, `ip`\n"
     "*Clipboard:* `copy <text>`, `paste`\n"
+    "*Launchers:* 🚀 Launchers menu, `go <name>` — runs files/shortcuts from the launchers folder\n"
     "*Shell:* `cmd <command>`, `ps1 <command>`, `launch <program>`, `url <link>`\n"
     "*Media:* 🎦 VLC menu, 🎬 Netflix menu\n"
     "*Capture:* 📸 Screenshot, 🎥 Record, 📷 Webcam\n"
