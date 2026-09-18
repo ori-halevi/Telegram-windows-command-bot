@@ -56,14 +56,22 @@ def _enable_shutdown_privilege() -> None:
             kernel.CloseHandle(token)
 
 
-def _suspend_later(hibernate: bool, delay: float = 1.5) -> None:
+def _suspend_later(hibernate: bool, ready: threading.Event | None = None,
+                   delay: float = 1.5) -> None:
     """Suspend from a background thread, after the Telegram reply has gone out.
 
     SetSuspendState only returns once the machine wakes up again, so calling it
     inline would hold the handler thread — and the reply — until then.
+    If `ready` is given, wait for the caller to set it (its replies were sent)
+    instead of guessing with a fixed delay; the timeout keeps a failed send
+    from cancelling the suspend.
     """
     def run() -> None:
-        time.sleep(delay)
+        if ready is not None:
+            ready.wait(timeout=15)
+            time.sleep(0.5)
+        else:
+            time.sleep(delay)
         _enable_shutdown_privilege()
         # Deliberately not `rundll32 powrprof.dll,SetSuspendState 0,1,0`: that
         # entry point gets its argument as a *string pointer*, which is never
@@ -77,23 +85,23 @@ def _suspend_later(hibernate: bool, delay: float = 1.5) -> None:
     threading.Thread(target=run, daemon=True).start()
 
 
-def sleep_pc() -> str:
+def sleep_pc(ready: threading.Event | None = None) -> str:
     """S3 standby: session stays in RAM, RAM stays powered, wakes in seconds."""
     try:
-        _suspend_later(hibernate=False)
+        _suspend_later(hibernate=False, ready=ready)
         return "💤 Sleep requested (session kept in RAM)"
     except Exception as e:
         log.exception("sleep_pc failed")
         return f"❌ Sleep failed: {e}"
 
 
-def hibernate_pc() -> str:
+def hibernate_pc(ready: threading.Event | None = None) -> str:
     """S4: RAM is written to hiberfil.sys and the PC powers off completely."""
     try:
         if not ctypes.windll.powrprof.IsPwrHibernateAllowed():
             return ("❌ Hibernate is turned off on this PC.\n"
                     "Enable it from an admin terminal: powercfg /hibernate on")
-        _suspend_later(hibernate=True)
+        _suspend_later(hibernate=True, ready=ready)
         return "🌙 Hibernate requested (RAM saved to disk, power off)"
     except Exception as e:
         log.exception("hibernate_pc failed")

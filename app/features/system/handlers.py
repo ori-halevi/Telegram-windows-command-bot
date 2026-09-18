@@ -1,6 +1,9 @@
 """System power + info handlers."""
 from __future__ import annotations
 
+import logging
+import threading
+
 from telegram import Update
 from telegram.ext import Application, CallbackQueryHandler, ContextTypes
 
@@ -8,6 +11,8 @@ from ...core import menu
 from ...core.types import TextResult
 from ...shared.telegram_utils import to_thread
 from . import service, ui
+
+log = logging.getLogger(__name__)
 
 
 _POWER_CALLBACKS = {
@@ -21,6 +26,13 @@ _POWER_CALLBACKS = {
     "status": service.screen_status,
     "states": service.power_states,
 }
+
+# Actions that post a lasting confirmation message (its timestamp records when
+# the PC went down) followed by a fresh power menu, so the menu stays at the
+# bottom of the chat instead of being pushed up by the confirmations.
+_CONFIRMED = {"lock", "sleep", "hibernate", "dark", "restart", "shutdown"}
+# These suspend the PC; they wait until the messages are sent.
+_SUSPENDS = {"sleep", "hibernate"}
 
 
 def match_text(text: str, chat_id: int) -> TextResult | None:
@@ -68,11 +80,30 @@ async def _on_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     parts = (q.data or "").split(":")
     sub = parts[1] if len(parts) > 1 else ""
     fn = _POWER_CALLBACKS.get(sub)
-    msg = await to_thread(fn) if fn else "?"
+    if fn is None or sub not in _CONFIRMED or q.message is None:
+        msg = await to_thread(fn) if fn else "?"
+        try:
+            await q.answer(msg[:200])
+        except Exception:
+            pass
+        return
+
+    ready = threading.Event() if sub in _SUSPENDS else None
     try:
-        await q.answer(msg[:200])
-    except Exception:
-        pass
+        msg = await (to_thread(fn, ready) if ready else to_thread(fn))
+        try:
+            await q.answer()
+        except Exception:
+            pass
+        try:
+            await q.message.reply_text(msg)
+            await q.message.reply_text("🔋 Choose a power action:",
+                                       reply_markup=ui.power_menu())
+        except Exception:
+            log.exception("power confirmation send failed")
+    finally:
+        if ready is not None:
+            ready.set()
 
 
 def register(app: Application) -> None:
