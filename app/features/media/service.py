@@ -52,14 +52,14 @@ NETFLIX = {
 # Telegram Desktop media viewer — assumes the video is open in full screen.
 # Arrows seek 5s per press; switching videos only works outside full screen.
 TG_SEEK = {"5s": 1, "10s": 2, "30s": 6, "1m": 12, "2m": 24, "3m": 36}
-TG_FULLSCREEN_DELAY = 0.4  # let Telegram animate in/out of full screen
+TG_FULLSCREEN_DELAY = 0.6  # let Telegram animate in/out of full screen
 # Serialize Telegram actions: two quick taps would otherwise interleave their
 # Ctrl+F sequences (each runs in its own worker thread) and invert full screen.
 _tg_lock = threading.Lock()
 
 TELEGRAM = {
     "play": ("press", "space"),
-    "fullscreen": ("hotkey", "ctrl+f"),
+    "fullscreen": ("custom", "tg_fullscreen"),
     "esc": ("press", "esc"),
     "next": ("custom", "tg_next"),
     "prev": ("custom", "tg_prev"),
@@ -68,12 +68,25 @@ TELEGRAM = {
 }
 
 
+def _held_hotkey(*keys: str, hold: float = 0.05) -> None:
+    """Press a combo with real gaps between down/up events.
+
+    The recorder sets pyautogui.PAUSE = 0 globally, so pyautogui.hotkey()
+    fires all events back-to-back and Telegram (Qt) misses the combo."""
+    for k in keys:
+        pyautogui.keyDown(k)
+        time.sleep(hold)
+    for k in reversed(keys):
+        pyautogui.keyUp(k)
+        time.sleep(hold)
+
+
 def _tg_switch_video(arrow: str) -> None:
-    pyautogui.hotkey("ctrl", "f")       # leave full screen
+    pyautogui.press("esc")              # leave full screen (single key, no combo)
     time.sleep(TG_FULLSCREEN_DELAY)
     pyautogui.press(arrow)              # move to adjacent video
     time.sleep(TG_FULLSCREEN_DELAY)
-    pyautogui.hotkey("ctrl", "f")       # back to full screen
+    _held_hotkey("ctrl", "f")           # back to full screen
 
 
 def _execute(action: tuple[str, str]) -> None:
@@ -99,6 +112,8 @@ def _execute(action: tuple[str, str]) -> None:
         elif payload == "jump_forward_2":
             pyautogui.hotkey("ctrl", "right")
             pyautogui.hotkey("ctrl", "right")
+        elif payload == "tg_fullscreen":
+            _held_hotkey("ctrl", "f")
         elif payload == "tg_next":
             _tg_switch_video("right")
         elif payload == "tg_prev":

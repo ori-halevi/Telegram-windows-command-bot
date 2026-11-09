@@ -14,6 +14,7 @@ from .core import router
 from .core.config import CONFIG, ICON_PATH, LOG_DIR
 from .core.errors import register_error_handlers
 from .features import ALL_FEATURES
+from .shared.keyboard_layout import pin_pyautogui_to_us_layout
 from .shared.logging import setup_logging
 from .shared.window_icon import set_console_icon
 
@@ -23,6 +24,7 @@ log = logging.getLogger(__name__)
 def build_app() -> Application:
     setup_logging(LOG_DIR, CONFIG.log_level)
     set_console_icon(ICON_PATH)
+    pin_pyautogui_to_us_layout()  # letters must work under a Hebrew layout too
     request = HTTPXRequest(connect_timeout=30, read_timeout=30)
     app = (
         ApplicationBuilder()
