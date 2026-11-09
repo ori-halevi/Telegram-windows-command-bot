@@ -53,6 +53,7 @@ NETFLIX = {
 # Arrows seek 5s per press; switching videos only works outside full screen.
 TG_SEEK = {"5s": 1, "10s": 2, "30s": 6, "1m": 12, "2m": 24, "3m": 36}
 TG_FULLSCREEN_DELAY = 0.6  # let Telegram animate in/out of full screen
+TG_VIDEO_LOAD_DELAY = 3.0  # new video must load before Ctrl+F takes effect
 # Serialize Telegram actions: two quick taps would otherwise interleave their
 # Ctrl+F sequences (each runs in its own worker thread) and invert full screen.
 _tg_lock = threading.Lock()
@@ -85,7 +86,7 @@ def _tg_switch_video(arrow: str) -> None:
     pyautogui.press("esc")              # leave full screen (single key, no combo)
     time.sleep(TG_FULLSCREEN_DELAY)
     pyautogui.press(arrow)              # move to adjacent video
-    time.sleep(TG_FULLSCREEN_DELAY)
+    time.sleep(TG_VIDEO_LOAD_DELAY)
     _held_hotkey("ctrl", "f")           # back to full screen
 
 
