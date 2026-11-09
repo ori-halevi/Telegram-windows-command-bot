@@ -30,7 +30,7 @@
     </td>
     <td align="center" width="33%">
       <img src="docs/screenshots/combo-builder.jpg" alt="Keyboard menu with L/R modifier pills" width="260" />
-      <br><sub><b>3. ⌨️ Keyboard</b><br>L/R modifier pills + split-keyboard key layout + Fire-mods-alone</sub>
+      <br><sub><b>3. ⌨️ Keyboard</b><br>L/R modifier pills + alphabetical key layout + Fire-mods-alone</sub>
     </td>
   </tr>
 </table>
@@ -273,7 +273,7 @@ Tap **⌨️ Keyboard** in the menu. You get:
   ▫ R Ctrl  ▫ R Shift  ▫ R Alt  ▫ R Win
   ```
 - An action row: `✖ Reset mods` · `🔁 Refresh` · **`▶ Fire mods alone`** · **`🌍 Lang (Win+Space)`**
-- The keys in a split-keyboard layout — left-hand half (1–5, Q–T, A–G, ⇪ Z–V) then right-hand half (6–0, Y–P, H–;, B–.), because Telegram shows at most 8 buttons per row — plus Tab · Space · ⌫ · Enter, Esc/F1–F12, punctuation, an Ins/Home/PgUp/Del/End/PgDn block and ↑ ← ↓ → arrows.
+- The keys: letters A–Z in alphabetical rows of 8 (Telegram shows at most 8 buttons per row, so a 10-key QWERTY row can't fit), then digits and punctuation, Tab · Space · ⌫ · Enter, Esc / ⇪ Caps / PrtSc, F1–F12, an Ins/Home/PgUp/Del/End/PgDn block and ↑ ← ↓ → arrows.
 
 Toggle any combination of modifiers, then tap a key — the combo fires and modifiers reset. Use **▶ Fire mods alone** to press just the toggled modifiers (e.g. tap `L Win` then **Fire** to open the Start menu). The `🌍 Lang` shortcut sends `Win+Space` directly so you can flip keyboard layouts without setting any modifier.
 
