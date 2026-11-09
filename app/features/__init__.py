@@ -9,7 +9,7 @@ from __future__ import annotations
 # Order: more specific button matches first; verb-based features after.
 from . import (
     start_help,           # /start, /help, /about, /release_keys
-    keys,                 # ⌨️ Builder, ⌨️ Keys, k <combo>, type <text>
+    keys,                 # ⌨️ Keyboard, ⌨️ Keys, k <combo>, type <text>
     macros,               # 📝 Macros, /macro, /save_macro, ...
     recorder,             # 📼 Recorder — record & replay mouse/keyboard macros
     switcher,             # 🔀 Switcher (interactive Alt+Tab)

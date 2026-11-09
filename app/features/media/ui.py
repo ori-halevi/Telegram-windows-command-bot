@@ -1,7 +1,9 @@
-"""VLC and Netflix inline keyboards."""
+"""VLC, Netflix and Telegram-video inline keyboards."""
 from __future__ import annotations
 
 from telegram import InlineKeyboardButton as IB, InlineKeyboardMarkup
+
+from .service import TG_SEEK
 
 
 def vlc_menu() -> InlineKeyboardMarkup:
@@ -43,4 +45,17 @@ def netflix_menu() -> InlineKeyboardMarkup:
         [IB("➖ Vol", callback_data="nfx:vol_down"),
          IB("➕ Vol", callback_data="nfx:vol_up")],
         [IB("🌍 Lang", callback_data="nfx:change_lang")],
+    ])
+
+
+def telegram_menu() -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup([
+        [IB("⏯", callback_data="tgv:play"),
+         IB("⛶", callback_data="tgv:fullscreen"),
+         IB("Esc", callback_data="tgv:esc")],
+        [IB("⏮ video", callback_data="tgv:prev"),
+         IB("⏭ video", callback_data="tgv:next")],
+        *[[IB(f"⏪{k}", callback_data=f"tgv:back_{k}"),
+           IB(f"⏩{k}", callback_data=f"tgv:fwd_{k}")]
+          for k in TG_SEEK],
     ])

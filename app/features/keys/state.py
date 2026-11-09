@@ -17,10 +17,10 @@ VALID_MODIFIERS = (
 )
 
 MOD_LABELS = {
-    "ctrlleft": "Ctrl←", "ctrlright": "Ctrl→",
-    "shiftleft": "Shift←", "shiftright": "Shift→",
-    "altleft": "Alt←", "altright": "Alt→",
-    "winleft": "Win←", "winright": "Win→",
+    "ctrlleft": "L Ctrl", "ctrlright": "R Ctrl",
+    "shiftleft": "L Shift", "shiftright": "R Shift",
+    "altleft": "L Alt", "altright": "R Alt",
+    "winleft": "L Win", "winright": "R Win",
 }
 
 

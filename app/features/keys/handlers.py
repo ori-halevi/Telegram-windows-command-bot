@@ -1,4 +1,4 @@
-"""Combo Builder handlers — text + callback."""
+"""⌨️ Keyboard (combo builder) handlers — text + callback."""
 from __future__ import annotations
 
 import logging
@@ -25,13 +25,13 @@ def _keys_help() -> str:
         "  `k ctrl+c`\n"
         "  `k win+e`\n\n"
         "Aliases: win=windows=meta=cmd, control=ctrl, option=alt.\n"
-        "Or use the ⌨️ Builder for a click-to-toggle UI."
+        "Or use the ⌨️ Keyboard for a click-to-toggle UI."
     )
 
 
 def match_text(text: str, chat_id: int) -> TextResult | None:
     low = text.strip().lower()
-    if low == menu.BUILDER.lower():
+    if low in (menu.BUILDER.lower(), menu.BUILDER_LEGACY.lower()):
         return TextResult(
             text=ui.builder_caption(chat_id),
             reply_markup=ui.builder_menu(chat_id),

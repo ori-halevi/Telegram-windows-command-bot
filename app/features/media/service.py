@@ -1,7 +1,9 @@
-"""VLC and Netflix shortcut handlers."""
+"""VLC, Netflix and Telegram-video shortcut handlers."""
 from __future__ import annotations
 
 import logging
+import threading
+import time
 
 import pyautogui
 from keyboard import send as kb_send
@@ -47,6 +49,32 @@ NETFLIX = {
     "change_lang": ("hotkey", "win+space"),
 }
 
+# Telegram Desktop media viewer — assumes the video is open in full screen.
+# Arrows seek 5s per press; switching videos only works outside full screen.
+TG_SEEK = {"5s": 1, "10s": 2, "30s": 6, "1m": 12, "2m": 24, "3m": 36}
+TG_FULLSCREEN_DELAY = 0.4  # let Telegram animate in/out of full screen
+# Serialize Telegram actions: two quick taps would otherwise interleave their
+# Ctrl+F sequences (each runs in its own worker thread) and invert full screen.
+_tg_lock = threading.Lock()
+
+TELEGRAM = {
+    "play": ("press", "space"),
+    "fullscreen": ("hotkey", "ctrl+f"),
+    "esc": ("press", "esc"),
+    "next": ("custom", "tg_next"),
+    "prev": ("custom", "tg_prev"),
+    **{f"fwd_{k}": ("custom", f"tg_seek:right:{n}") for k, n in TG_SEEK.items()},
+    **{f"back_{k}": ("custom", f"tg_seek:left:{n}") for k, n in TG_SEEK.items()},
+}
+
+
+def _tg_switch_video(arrow: str) -> None:
+    pyautogui.hotkey("ctrl", "f")       # leave full screen
+    time.sleep(TG_FULLSCREEN_DELAY)
+    pyautogui.press(arrow)              # move to adjacent video
+    time.sleep(TG_FULLSCREEN_DELAY)
+    pyautogui.hotkey("ctrl", "f")       # back to full screen
+
 
 def _execute(action: tuple[str, str]) -> None:
     kind, payload = action
@@ -71,6 +99,13 @@ def _execute(action: tuple[str, str]) -> None:
         elif payload == "jump_forward_2":
             pyautogui.hotkey("ctrl", "right")
             pyautogui.hotkey("ctrl", "right")
+        elif payload == "tg_next":
+            _tg_switch_video("right")
+        elif payload == "tg_prev":
+            _tg_switch_video("left")
+        elif payload.startswith("tg_seek:"):
+            _, arrow, count = payload.split(":")
+            pyautogui.press(arrow, presses=int(count), interval=0.03)
 
 
 def handle_vlc(cmd: str) -> str:
@@ -94,4 +129,17 @@ def handle_netflix(cmd: str) -> str:
         return f"🎬 Netflix: {cmd}"
     except Exception as e:
         log.exception("netflix")
+        return f"❌ {e}"
+
+
+def handle_telegram(cmd: str) -> str:
+    action = TELEGRAM.get(cmd)
+    if not action:
+        return f"❌ Unknown Telegram video command: {cmd}"
+    try:
+        with _tg_lock:
+            _execute(action)
+        return f"✈️ Telegram: {cmd}"
+    except Exception as e:
+        log.exception("telegram video")
         return f"❌ {e}"

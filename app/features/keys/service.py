@@ -56,7 +56,12 @@ def parse_combo(combo: str) -> list[str]:
 
 
 def send_combo(combo: str) -> str:
-    keys = parse_combo(combo)
+    return send_keys(parse_combo(combo), combo)
+
+
+def send_keys(keys: list[str], combo: str = "") -> str:
+    """Press already-split keys together. Used directly by the builder so
+    keys like ',' aren't eaten by parse_combo's separator split."""
     if not keys:
         return "❌ Empty combo"
     ok, bad = _validate_keys(keys)
@@ -114,8 +119,7 @@ def builder_press_key(chat_id: int, key: str) -> str:
     """Combine current toggled modifiers with `key`, send, then clear modifiers."""
     from . import state
     mods = state.get_modifiers(chat_id)
-    combo = "+".join(mods + [key]) if mods else key
-    result = send_combo(combo)
+    result = send_keys(mods + [_normalize_token(key)])
     state.clear_modifiers(chat_id)
     return result
 

@@ -16,7 +16,8 @@ SCREENSHOT = "📸 Screenshot"
 RECORD = "🎥 Record screen"
 WEBCAM = "📷 Webcam"
 KEYS = "⌨️ Keys"
-BUILDER = "⌨️ Builder"
+BUILDER = "⌨️ Keyboard"
+BUILDER_LEGACY = "⌨️ Builder"  # old label, still on phones until /start
 MACROS = "📝 Macros"
 RECORDER = "📼 Recorder"
 SWITCHER = "🔀 Switcher"
@@ -24,6 +25,7 @@ WINDOWS = "🪟 Windows"
 PROCESSES = "📄 Processes"
 VLC = "🎦 VLC"
 NETFLIX = "🎬 Netflix"
+TG_VIDEO = "✈️ TG Video"
 FILES = "📂 Files"
 CLIPBOARD = "✂ Clipboard"
 LAUNCHERS = "🚀 Launchers"
@@ -37,7 +39,7 @@ LAYOUT = [
     [KEYS, BUILDER, MACROS],
     [RECORDER],
     [SWITCHER, WINDOWS, PROCESSES],
-    [VLC, NETFLIX],
+    [VLC, NETFLIX, TG_VIDEO],
     [FILES, CLIPBOARD],
     [LAUNCHERS, HELP],
 ]

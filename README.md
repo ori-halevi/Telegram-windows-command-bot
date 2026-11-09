@@ -4,7 +4,7 @@
   # Telegram Windows Command Bot
 
   **Control your Windows PC from anywhere via Telegram.**
-  Send any keyboard combo, browse windows, take screenshots, drive VLC/Netflix, manage processes, and more — all from your phone.
+  Send any keyboard combo, browse windows, take screenshots, drive VLC/Netflix/Telegram videos, manage processes, and more — all from your phone.
 
   <p>
     <img src="https://img.shields.io/badge/python-3.12-blue.svg" alt="Python" />
@@ -26,11 +26,11 @@
     </td>
     <td align="center" width="33%">
       <img src="docs/screenshots/power-and-hotspot.jpg" alt="Power and Hotspot inline keyboards" width="260" />
-      <br><sub><b>2. Inline keyboards</b><br>Power · Hotspot · Bluetooth · Wi-Fi · Volume · Brightness · VLC · Netflix</sub>
+      <br><sub><b>2. Inline keyboards</b><br>Power · Hotspot · Bluetooth · Wi-Fi · Volume · Brightness · VLC · Netflix · Telegram video</sub>
     </td>
     <td align="center" width="33%">
-      <img src="docs/screenshots/combo-builder.jpg" alt="Combo Builder with L/R modifier pills" width="260" />
-      <br><sub><b>3. ⌨️ Combo Builder</b><br>L/R modifier pills + full key grid + Fire-mods-alone</sub>
+      <img src="docs/screenshots/combo-builder.jpg" alt="Keyboard menu with L/R modifier pills" width="260" />
+      <br><sub><b>3. ⌨️ Keyboard</b><br>L/R modifier pills + split-keyboard key layout + Fire-mods-alone</sub>
     </td>
   </tr>
 </table>
@@ -73,7 +73,7 @@ It is built around a single killer primitive — **arbitrary keyboard combinatio
 - **📼 Record & Replay macros** — record any sequence of real mouse movements, clicks, scrolls, and keystrokes; save it under a name; replay it on demand with one tap. DPI-aware coordinate mapping, resolution guard, and a live Pause/Resume button during playback. See [Recorder](#recorder) below.
 - **🎹 Flexible keyboard combos** — send *any* hotkey three different ways:
   - Free-text: `k ctrl+alt+del`, `k win+shift+s`, `k alt+f4` …
-  - Interactive **Combo Builder** — toggleable L/R modifier pills (`Ctrl←`, `Win→`, `Alt←`, `Shift→`, …) plus a click-to-fire key grid; tap **▶ Fire mods alone** to press just `Win` or just `Ctrl`.
+  - Interactive **⌨️ Keyboard** (combo builder) — toggleable L/R modifier pills (`L Ctrl`, `R Win`, `L Alt`, `R Shift`, …) plus a click-to-fire key grid; tap **▶ Fire mods alone** to press just `Win` or just `Ctrl`.
   - Persistent named **macros** — `/save_macro snip win+shift+s`, then `/macro snip`.
 - **🔀 Interactive Alt+Tab switcher** — the bot holds `Alt` down between messages and edits a screenshot in-place each time you tap `Tab+1` / `Tab-1`, just like cycling on a real keyboard. Tap **✅ Commit** to release Alt and switch.
 - **⌨️ Type any Unicode text** — `type שלום עולם` works (clipboard-paste path, so Hebrew/CJK/emoji work).
@@ -81,7 +81,7 @@ It is built around a single killer primitive — **arbitrary keyboard combinatio
 - **🔊 System control** — master volume + mute, screen brightness (via WMI), lock / sleep / hibernate / restart / shutdown / abort, screensaver.
 - **🌐 Network** — toggle Mobile Hotspot and Bluetooth, list Wi-Fi networks, current SSID, local & public IP.
 - **🪟 Window & process management** — list / focus / close windows, top processes by RAM, kill by name or PID.
-- **🎦 Media controls** — VLC and Netflix inline keyboards (play/pause, jump, subtitles, fullscreen, …).
+- **🎦 Media controls** — VLC, Netflix and Telegram-video inline keyboards (play/pause, jump, subtitles, fullscreen, …). The Telegram remote assumes the video is open full screen in Telegram Desktop: seeking repeats the 5s arrow step, and next/prev video exits full screen, flips, and re-enters.
 - **📂 Files & shell** — `ls / cd / pwd / download <path>`, `cmd <command>`, `ps1 <powershell>`, `launch <program>`, `url <link>`.
 - **🌍 Multilingual security** — intruders get a denial message in 12 languages plus a link to the public source.
 - **📜 Atomic state, rotating logs, rate limiting** — production-friendly defaults out of the box.
@@ -200,10 +200,10 @@ After `/start`, a reply keyboard appears with these groups:
 📡 Hotspot      | 🎧 Bluetooth | 📶 Wi-Fi
 🔊 Volume       | 💡 Brightness
 📸 Screenshot   | 🎥 Record screen | 📷 Webcam
-⌨️ Keys         | ⌨️ Builder       | 📝 Macros
+⌨️ Keys         | ⌨️ Keyboard      | 📝 Macros
 📼 Recorder
 🔀 Switcher     | 🪟 Windows       | 📄 Processes
-🎦 VLC          | 🎬 Netflix
+🎦 VLC          | 🎬 Netflix       | ✈️ TG Video
 📂 Files        | ✂ Clipboard
 💡 Help
 ```
@@ -259,27 +259,27 @@ type שלום עולם           # type Unicode text via clipboard
 
 Aliases: `win` = `windows` = `meta` = `cmd`, `control` = `ctrl`, `option` = `alt`, `del` = `delete`, `esc` = `escape`, `pgup` / `pgdn`, `arrowleft` etc.
 
-**2. Combo Builder — visual click-to-toggle**
+**2. ⌨️ Keyboard — visual click-to-toggle**
 
 <table>
   <tr>
     <td valign="top">
 
-Tap **⌨️ Builder** in the menu. You get:
+Tap **⌨️ Keyboard** in the menu. You get:
 
 - Two rows of toggleable modifier pills:
   ```
-  ▫ Ctrl←  ▫ Shift←  ▫ Alt←  ▫ Win←
-  ▫ Ctrl→  ▫ Shift→  ▫ Alt→  ▫ Win→
+  ▫ L Ctrl  ▫ L Shift  ▫ L Alt  ▫ L Win
+  ▫ R Ctrl  ▫ R Shift  ▫ R Alt  ▫ R Win
   ```
 - An action row: `✖ Reset mods` · `🔁 Refresh` · **`▶ Fire mods alone`** · **`🌍 Lang (Win+Space)`**
-- A grid of every key (esc, F1–F12, 0–9, a–z, punctuation, arrows, home/end, pgup/pgdn, ins/del, capslock, …).
+- The keys in a split-keyboard layout — left-hand half (1–5, Q–T, A–G, ⇪ Z–V) then right-hand half (6–0, Y–P, H–;, B–.), because Telegram shows at most 8 buttons per row — plus Tab · Space · ⌫ · Enter, Esc/F1–F12, punctuation, an Ins/Home/PgUp/Del/End/PgDn block and ↑ ← ↓ → arrows.
 
-Toggle any combination of modifiers, then tap a key — the combo fires and modifiers reset. Use **▶ Fire mods alone** to press just the toggled modifiers (e.g. tap `Win←` then **Fire** to open the Start menu). The `🌍 Lang` shortcut sends `Win+Space` directly so you can flip keyboard layouts without setting any modifier.
+Toggle any combination of modifiers, then tap a key — the combo fires and modifiers reset. Use **▶ Fire mods alone** to press just the toggled modifiers (e.g. tap `L Win` then **Fire** to open the Start menu). The `🌍 Lang` shortcut sends `Win+Space` directly so you can flip keyboard layouts without setting any modifier.
 
 </td>
     <td valign="top" width="280">
-      <img src="docs/screenshots/combo-builder.jpg" alt="Combo Builder inline keyboard" width="260" />
+      <img src="docs/screenshots/combo-builder.jpg" alt="Keyboard inline menu" width="260" />
     </td>
   </tr>
 </table>
@@ -380,7 +380,7 @@ project/
 │   │
 │   └── features/                  # one folder per feature
 │       ├── start_help/            # /start, /help, /about, /release_keys
-│       ├── keys/                  # ⌨️ Keys, ⌨️ Builder, k <combo>, type
+│       ├── keys/                  # ⌨️ Keys, ⌨️ Keyboard, k <combo>, type
 │       ├── macros/
 │       ├── switcher/              # 🔀 interactive Alt+Tab
 │       ├── system/                # 📊 info + 🔋 power
@@ -394,7 +394,7 @@ project/
 │       ├── clipboard/             # ✂
 │       ├── network/               # 📡 / 🎧 / 📶 / ip
 │       ├── shell/                 # cmd / ps1 / launch / url
-│       ├── media/                 # 🎦 VLC + 🎬 Netflix
+│       ├── media/                 # 🎦 VLC + 🎬 Netflix + ✈️ Telegram video
 │       └── recorder/              # 📼 record & replay mouse/keyboard macros
 │
 ├── data/                          # persistent JSON state (atomic writes)
@@ -418,7 +418,7 @@ project/
 - Each feature is a **plug-in** — adding or removing one means touching one folder and one line in `app/features/__init__.py`.
 - No god-files: there is no central `handlers.py` or `ui.py`. Inline keyboards live next to the logic that uses them.
 - The text dispatcher is a **chain of responsibility** — `core/router.py` walks `ALL_FEATURES` in order and asks each `match_text(text, chat_id)`. The first non-`None` reply wins. Heavy/stateful features (screenshot, recording, webcam, switcher) skip the chain and register their own `MessageHandler` so they can stream binary uploads.
-- Callbacks are **namespaced per feature** (`vlc:`, `nfx:`, `kb:`, `sw:`, `vol:`, `bright:`, `power:`, `net:`) and routed via `CallbackQueryHandler(pattern=r"^ns:")` — no central callback dispatcher.
+- Callbacks are **namespaced per feature** (`vlc:`, `nfx:`, `tgv:`, `kb:`, `sw:`, `vol:`, `bright:`, `power:`, `net:`) and routed via `CallbackQueryHandler(pattern=r"^ns:")` — no central callback dispatcher.
 
 ## Security
 
@@ -469,10 +469,10 @@ The single `.exe` will still need `.env` and the `data/` and `logs/` folders nex
 > בוט טלגרם ששולט על מחשב Windows מרחוק.
 
 **מה זה?**
-שולחים הודעות לבוט בטלגרם — והמחשב מבצע את הפקודות. שילוב מקשים כלשהו, צילומי מסך, נעילה / שינה / כיבוי, שליטה ב־VLC ובנטפליקס, קריאת פרוצסים, גלישה בקבצים, הקלטת מסך, **הקלטה וניגון מחדש של מאקרו עכבר/מקלדת** ועוד.
+שולחים הודעות לבוט בטלגרם — והמחשב מבצע את הפקודות. שילוב מקשים כלשהו, צילומי מסך, נעילה / שינה / כיבוי, שליטה ב־VLC, בנטפליקס ובוידאו של טלגרם, קריאת פרוצסים, גלישה בקבצים, הקלטת מסך, **הקלטה וניגון מחדש של מאקרו עכבר/מקלדת** ועוד.
 
 **הפיצ'ר המרכזי — שילובי מקשים גמישים**
-אפשר לשלוח כל קומבינציה: `k ctrl+alt+del`, `k win+shift+s`, `k alt+f4`. אם לא זוכרים את התחביר — לוחצים על **⌨️ Builder** ובונים את הקומבינציה בלחיצות (יש Ctrl/Shift/Alt/Win לשני הצדדים, ימין ושמאל). אפשר גם לשמור macros עם שם:
+אפשר לשלוח כל קומבינציה: `k ctrl+alt+del`, `k win+shift+s`, `k alt+f4`. אם לא זוכרים את התחביר — לוחצים על **⌨️ Keyboard** ובונים את הקומבינציה בלחיצות (יש Ctrl/Shift/Alt/Win לשני הצדדים, ימין ושמאל). אפשר גם לשמור macros עם שם:
 
 ```
 /save_macro snip win+shift+s
